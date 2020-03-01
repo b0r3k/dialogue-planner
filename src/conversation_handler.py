@@ -5,7 +5,7 @@ import time
 from .state import DialogueState
 
 
-class Handler(object):
+class ConversationHandler(object):
 
     def __init__(self, conf, logger, should_continue=None):
         self.conf = conf
