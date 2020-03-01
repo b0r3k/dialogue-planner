@@ -1,8 +1,13 @@
 import logging
+import pydoc
+
+import yaml
 
 
 def load_conf(conf_path):
-    return {'logging_level': 'DEBUG'}
+    with open(conf_path, 'rt') as in_fd:
+        conf = yaml.load(in_fd, Loader=yaml.FullLoader)
+    return conf
 
 
 def setup_logging(conf):
@@ -11,5 +16,11 @@ def setup_logging(conf):
     logging.basicConfig(level=logging_level, format='%(asctime)-15s %(message)s')
     return logger
 
+
 def run_for_n_iterations(n):
     return lambda handler: handler.iterations < n
+
+
+def dynload_class(path):
+    cls = pydoc.locate(path)
+    return cls

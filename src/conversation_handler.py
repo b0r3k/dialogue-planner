@@ -3,6 +3,7 @@ import json
 import time
 
 from .state import DialogueState
+from .utils import dynload_class
 
 
 class ConversationHandler(object):
@@ -19,7 +20,17 @@ class ConversationHandler(object):
         else:
             self.should_continue = lambda _: True
         # TODO: can be configurable callable
-        self.user_stream = lambda _:  input('USER> ').strip().lower()
+        stream_loaded = False
+        if 'user_stream' in self.conf:
+            user_stream_cls = dynload_class(self.conf['user_stream'])
+            if user_stream_cls is None:
+                self.logger.error('Could not find class "%s"', self.conf['user_stream'])
+            else:
+                self.user_stream = user_stream_cls()
+                stream_loaded = True
+        if not stream_loaded:
+            self.user_stream = lambda _:  input('USER> ').strip().lower()
+
         self._load_components()
         self._reset()
 
@@ -43,7 +54,7 @@ class ConversationHandler(object):
             state['user'] = user_utterance
             for component in self.components:
                 state = component(state, self.logger)
-                Handler._assert_is_valid_state(state)
+                ConversationHandler._assert_is_valid_state(state)
             if state['system'] is None:
                 logging.error('System response not filled by the pipeline!')
                 break
@@ -63,6 +74,14 @@ class ConversationHandler(object):
 
     def _load_components(self):
         self.components = []
+        if 'components' not in self.conf:
+            return
+        for comp in self.conf['components']:
+            component_cls = dynload_class(comp)
+            if component_cls is None:
+                self.logger.error('Could not find class "%s"', comp)
+            else:
+                self.components.append(component_cls())
 
     def _setup_logging(self):
         """
@@ -78,6 +97,6 @@ class ConversationHandler(object):
 
     @staticmethod
     def _assert_is_valid_state(state):
-        assert isinstance(state, DialogueState)
+        assert isinstance(state, DialogueState), 'Returned state is not valid'
         for attr in DialogueState.essential_attributes():
-            assert hasattr(state, attr)
+            assert hasattr(state, attr), 'Returned state does not have the attribute {}'.format(attr)
