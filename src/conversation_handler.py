@@ -4,6 +4,7 @@ import time
 
 from .state import DialogueState
 from .utils import dynload_class
+from .components.component import Component
 
 
 class ConversationHandler(object):
@@ -34,6 +35,12 @@ class ConversationHandler(object):
         self._reset()
 
     def main_loop(self):
+        """
+        Main loop of the program.
+        While `self.should_continue` call returns true, runs the conversation with fresh DialogueState
+        and maintains the history.
+        :return: None
+        """
         while self.should_continue(self):
             self.logger.debug('Dialogue %d', self.iterations)
             state = DialogueState()
@@ -43,7 +50,17 @@ class ConversationHandler(object):
         with open(self.history_fn, 'wt') as of:
             json.dump(self.history, of)
 
-    def run_dialogue(self, state):
+    def run_dialogue(self, state: DialogueState):
+        """
+        With a given initial state, runs the conversation loop until the end of dialogue is set in the DialogueState.
+        First all components are initialized with given DialogueState.
+        Then subsequently reads the user stream, and calls all the components provided in the configuration.
+        The conversation loop is terminated by setting the end of dialogue,
+        using a break word or providing empty user input.
+        All the components need to be reset after each dialogue, they are NOT INSTANTIATED here.
+        :param state: initial DialogueState
+        :return: final DialogueState
+        """
         eod = False
         last_system = ""
         for component in self.components:
@@ -65,7 +82,6 @@ class ConversationHandler(object):
             self.logger.info('SYSTEM: %s', last_system)
             state.end_turn()
             # TODO: should we set maximum number of turns?
-            # TODO: keywords for stop the dialogue should be configurable
             eod = state.eod or \
                 len(user_utterance) == 0 or \
                 ('break_words' in self.conf and any([kw in user_utterance for kw in self.conf['break_words']]))
@@ -87,7 +103,10 @@ class ConversationHandler(object):
             if component_cls is None:
                 self.logger.error('Could not find class "%s"', comp)
             else:
-                self.components.append(component_cls())
+                component = component_cls()
+                assert isinstance(component, Component),\
+                    'Provided component has to inherit from the abstract class components.Component'
+                self.components.append(component)
 
     def _setup_logging(self):
         """

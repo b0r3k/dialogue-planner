@@ -1,6 +1,7 @@
 from copy import deepcopy
 
 
+# TODO: should we rename DialogueState -> Environment, state_dict -> dialogue_state ?
 class DialogueState:
 
     def __init__(self):
@@ -12,6 +13,11 @@ class DialogueState:
         super(DialogueState, self).__setattr__('history', [])
 
     def end_turn(self):
+        """
+        Method is called after the turn ends, resets the user and system utterances,
+        the nlu and appends to the history.
+        :return: None
+        """
         self.history.append({
             'user': self.user,
             'system': self.system,
@@ -57,4 +63,8 @@ class DialogueState:
 
     @staticmethod
     def essential_attributes():
+        """
+        Essential attributes that has to be present in the valid DialogueState instance.
+        :return: list of essential attributes
+        """
         return ['user', 'system', 'nlu', 'state_dict', 'history', 'eod']

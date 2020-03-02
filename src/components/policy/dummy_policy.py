@@ -1,4 +1,5 @@
 from ..component import Component
+from ...utils import choose_one
 
 
 class DummyPolicy(Component):
@@ -14,7 +15,7 @@ class DummyPolicy(Component):
             state.end_dialogue()
         elif 'greet' in state['state_dict']:
             if not self.greeted:
-                state.set_system_response('Hello there')
+                state.set_system_response(choose_one(['Hello there', 'Hi!', 'Tschus', 'Good morning']))
                 self.greeted = True
             else:
                 state.set_system_response('I said hello already.')
