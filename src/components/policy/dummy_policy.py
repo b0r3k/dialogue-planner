@@ -5,7 +5,7 @@ class DummyPolicy(Component):
     def __init__(self):
         self.greeted = False
 
-    def __call__(self, state, logger, *args, **kwargs):
+    def __call__(self, state, logger):
         if 'goodbye' in state['state_dict']:
             state.set_system_response('See you next time!')
             state.end_dialogue()

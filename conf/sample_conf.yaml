@@ -5,3 +5,6 @@ components:
   - "src.components.nlu.dummy_nlu.DummyNLU"
   - "src.components.dst.dummy_dst.DummyDST"
   - "src.components.policy.dummy_policy.DummyPolicy"
+break_words:
+  - "quit"
+  - "exit"

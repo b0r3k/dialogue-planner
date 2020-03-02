@@ -19,7 +19,6 @@ class ConversationHandler(object):
             self.should_continue = should_continue
         else:
             self.should_continue = lambda _: True
-        # TODO: can be configurable callable
         stream_loaded = False
         if 'user_stream' in self.conf:
             user_stream_cls = dynload_class(self.conf['user_stream'])
@@ -57,7 +56,8 @@ class ConversationHandler(object):
             for component in self.components:
                 state = component(state, self.logger)
                 ConversationHandler._assert_is_valid_state(state)
-            if state['system'] is None:
+            if state['system'] is None or len(state['system']) == 0:
+                # TODO: should be assert here?
                 logging.error('System response not filled by the pipeline!')
                 break
             last_system = state['system']
@@ -65,9 +65,10 @@ class ConversationHandler(object):
             self.logger.info('SYSTEM: %s', last_system)
             state.end_turn()
             # TODO: should we set maximum number of turns?
+            # TODO: keywords for stop the dialogue should be configurable
             eod = state.eod or \
                 len(user_utterance) == 0 or \
-                any([kw in user_utterance for kw in ['quit', 'exit', 'stop']])
+                ('break_words' in self.conf and any([kw in user_utterance for kw in self.conf['break_words']]))
         self.logger.info('Dialogue ended.')
         for component in self.components:
             component.reset()
@@ -105,3 +106,5 @@ class ConversationHandler(object):
         assert isinstance(state, DialogueState), 'Returned state is not valid'
         for attr in DialogueState.essential_attributes():
             assert hasattr(state, attr), 'Returned state does not have the attribute {}'.format(attr)
+        # assert state['system'] is not None and \
+        #     len(state['system']) > 0, 'System response not set'

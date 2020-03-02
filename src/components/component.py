@@ -13,20 +13,19 @@ class Component(ABC):
         return state
 
     @abstractmethod
-    def __call__(self, state: DialogueState, logger, *args, **kwargs):
+    def __call__(self, state: DialogueState, logger):
         """
         This method is called in every turn, takes the DialogueState, optionally modifies it and returns the result.
         :param state: DialogueState instance
         :param logger: logger reference, can be used for debugging purposes or verbose mode
-        :param args: not passed
-        :param kwargs: not passed
         :return: optionally modified DialogueState instance
         """
         pass
 
     def reset(self):
         """
-        Resets the component's optional flags and other properties, if any
+        Called after the end of the dialogue.
+        Resets the component's optional flags and other properties, if any.
         :return: None
         """
         return None
