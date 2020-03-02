@@ -1,7 +1,9 @@
+from copy import deepcopy
+
+
 class DialogueState:
 
-    def __init__(self, logger):
-        self.logger = logger
+    def __init__(self):
         self.user = ''
         self.system = ''
         self.nlu = {}
@@ -14,11 +16,20 @@ class DialogueState:
             'user': self.user,
             'system': self.system,
             'nlu': self.nlu,
-            'state_dict': self.state_dict
+            'state_dict': deepcopy(self.state_dict)
         })
         self.user = ''
         self.system = ''
         self.nlu = {}
+
+    def set_system_response(self, response):
+        self.system = response
+
+    def set_user_input(self, inp):
+        self.user = inp
+
+    def end_dialogue(self):
+        self.eod = True
 
     def __setattr__(self, key, value):
         if key == 'user':
@@ -42,7 +53,6 @@ class DialogueState:
         if hasattr(self, item):
             return getattr(self, item)
         else:
-            self.logger.warning('Attribute "{}" not found!'.format(item))
             return None
 
     @staticmethod

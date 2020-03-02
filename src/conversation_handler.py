@@ -37,7 +37,7 @@ class ConversationHandler(object):
     def main_loop(self):
         while self.should_continue(self):
             self.logger.debug('Dialogue %d', self.iterations)
-            state = DialogueState(self.logger)
+            state = DialogueState()
             final_state = self.run_dialogue(state)
             self.history.append(final_state['history'])
             self.iterations += 1
@@ -47,11 +47,13 @@ class ConversationHandler(object):
     def run_dialogue(self, state):
         eod = False
         last_system = ""
+        for component in self.components:
+            state = component.init_state(state)
         while not eod:
             time.sleep(.05)
             user_utterance = self.user_stream(last_system)
             self.logger.info('USER: %s', user_utterance)
-            state['user'] = user_utterance
+            state.set_user_input(user_utterance)
             for component in self.components:
                 state = component(state, self.logger)
                 ConversationHandler._assert_is_valid_state(state)
@@ -59,6 +61,7 @@ class ConversationHandler(object):
                 logging.error('System response not filled by the pipeline!')
                 break
             last_system = state['system']
+            print('SYSTEM:', last_system)
             self.logger.info('SYSTEM: %s', last_system)
             state.end_turn()
             # TODO: should we set maximum number of turns?
@@ -66,6 +69,8 @@ class ConversationHandler(object):
                 len(user_utterance) == 0 or \
                 any([kw in user_utterance for kw in ['quit', 'exit', 'stop']])
         self.logger.info('Dialogue ended.')
+        for component in self.components:
+            component.reset()
         return state
 
     def _reset(self):
