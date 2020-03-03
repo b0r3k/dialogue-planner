@@ -14,6 +14,7 @@ class DummyPolicy(Component):
             state.set_system_response('Empty input, ending the dialogue!')
             state.end_dialogue()
         elif 'greet' in state['state_dict']:
+            del state['state_dict']['greet']
             if not self.greeted:
                 state.set_system_response(choose_one(['Hello there', 'Hi!', 'Tschus', 'Good morning']))
                 self.greeted = True

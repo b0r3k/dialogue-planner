@@ -27,7 +27,7 @@ The object supports dictionary-like indexing and you can add your own attributes
 However, there are certain attributes that are mandatory and has to be present.
 Namely:
  - `state['user']`: User utterance, this attribute will be set for you. You should not need to modify it.
- - `state['system']`: Can be set via `DialogueState::set_system_response()`. It is mandatory to set this attribute at each turn in one of your components.
+ - `state['system']`: Can be set via `DialogueState.set_system_response()`. It is mandatory to set this attribute at each turn in one of your components.
  - `state['nlu']`: A dictionary of NLU annotation, doesn't have to be used.
  - `state['state_dict']'`: A dictionary representing the dialogue state, should be used to keep the persistent values.
  
