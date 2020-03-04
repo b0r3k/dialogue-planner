@@ -1,7 +1,10 @@
+#!/usr/bin/env python3
+
 import argparse
 import os
-from src.utils import load_conf, run_for_n_iterations, setup_logging
-from src.conversation_handler import ConversationHandler
+
+from dialmonkey.utils import load_conf, run_for_n_iterations, setup_logging
+from dialmonkey.conversation_handler import ConversationHandler
 
 
 def main(flags):

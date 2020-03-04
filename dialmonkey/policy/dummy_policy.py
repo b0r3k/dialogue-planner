@@ -1,5 +1,5 @@
 from ..component import Component
-from ...utils import choose_one
+from ..utils import choose_one
 
 
 class DummyPolicy(Component):

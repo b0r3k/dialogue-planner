@@ -4,7 +4,7 @@ import time
 
 from .state import DialogueState
 from .utils import dynload_class
-from .components.component import Component
+from .component import Component
 
 
 class ConversationHandler(object):

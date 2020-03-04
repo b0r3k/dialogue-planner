@@ -1,10 +1,10 @@
 ---
 logging_level: "DEBUG"
-user_stream: "src.components.input.console_input.ConsoleInput"
+user_stream: "dialmonkey.input.console_input.ConsoleInput"
 components:
-  - "src.components.nlu.dummy_nlu.DummyNLU"
-  - "src.components.dst.dummy_dst.DummyDST"
-  - "src.components.policy.dummy_policy.DummyPolicy"
+  - "dialmonkey.nlu.dummy_nlu.DummyNLU"
+  - "dialmonkey.dst.dummy_dst.DummyDST"
+  - "dialmonkey.policy.dummy_policy.DummyPolicy"
 break_words:
   - "quit"
   - "exit"

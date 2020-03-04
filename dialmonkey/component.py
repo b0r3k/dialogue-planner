@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from ..state import DialogueState
+from .state import DialogueState
 
 
 class Component(ABC):
