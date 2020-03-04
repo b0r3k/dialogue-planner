@@ -1,13 +1,15 @@
 from copy import deepcopy
+from .da import DA
 
 
 # TODO: should we rename DialogueState -> Environment, state_dict -> dialogue_state ?
+# XXX: OD: yes, sounds better :-)
 class DialogueState:
 
     def __init__(self):
         self.user = ''
         self.system = ''
-        self.nlu = {}
+        self.nlu = None
         self.eod = False
         super(DialogueState, self).__setattr__('state_dict', {})
         super(DialogueState, self).__setattr__('history', [])
@@ -26,7 +28,7 @@ class DialogueState:
         })
         self.user = ''
         self.system = ''
-        self.nlu = {}
+        self.nlu = None
 
     def set_system_response(self, response):
         self.system = response
@@ -38,17 +40,12 @@ class DialogueState:
         self.eod = True
 
     def __setattr__(self, key, value):
-        if key == 'user':
-            assert isinstance(value, str), 'Attribute "user" has to be of type "string"'
-            # TODO: should we normalize the utterance here?
-        elif key == 'system':
-            assert isinstance(value, str), 'Attribute "system" has to be of type "string"'
-        elif key == 'nlu':
-            assert isinstance(value, dict), 'Attribute "nlu" has to be of type "dict"'
+        if key in ['user', 'system']:
+            assert isinstance(value, str), f'Attribute "{key}" has to be of type "string"'
         elif key == 'eod':
             assert isinstance(value, bool), 'Attribute "eod" has to be of type "bool"'
         else:
-            assert key not in DialogueState.essential_attributes(),\
+            assert key not in ['history', 'state_dict'],\
                 'Modification of attribute "{}" is not allowed!'.format(key)
         super(DialogueState, self).__setattr__(key, value)
 

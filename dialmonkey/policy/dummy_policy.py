@@ -7,19 +7,18 @@ class DummyPolicy(Component):
         self.greeted = False
 
     def __call__(self, state, logger):
-        if 'goodbye' in state['state_dict']:
+        if state['state_dict'].get('intent') == 'greet':
+            if not self.greeted:
+                state.set_system_response(choose_one(['Hello there', 'Hi!', 'G\'day mate', 'Good morning']))
+                self.greeted = True
+            else:
+                state.set_system_response('I said hello already.')
+        elif state['state_dict'].get('intent')  == 'goodbye':
             state.set_system_response('See you next time!')
             state.end_dialogue()
         elif len(state['user']) == 0:
             state.set_system_response('Empty input, ending the dialogue!')
             state.end_dialogue()
-        elif 'greet' in state['state_dict']:
-            del state['state_dict']['greet']
-            if not self.greeted:
-                state.set_system_response(choose_one(['Hello there', 'Hi!', 'Tschus', 'Good morning']))
-                self.greeted = True
-            else:
-                state.set_system_response('I said hello already.')
         else:
             state.set_system_response('I don\'t know how to answer. I am just a dummy bot.')
         return state

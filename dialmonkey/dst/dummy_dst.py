@@ -3,7 +3,12 @@ from ..component import Component
 
 class DummyDST(Component):
     def __call__(self, state, logger):
-        for k, v in state['nlu'].items():
-            state['state_dict'][k] = v
+        if state['nlu']:
+            state['state_dict']['intent'] = state['nlu'][0].intent   # assume just one intent
+            for dai in state['nlu']:
+                if dai.slot:
+                    state['state_dict'][dai.slot] = dai.value
+        else:
+            state['state_dict']['intent'] = None
         logger.info('State: %s', str(state['state_dict']))
         return state
