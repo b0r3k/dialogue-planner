@@ -9,7 +9,7 @@ class DialogueState:
     def __init__(self):
         self.user = ''
         self.system = ''
-        self.nlu = None
+        self.nlu = DA()
         self.eod = False
         super(DialogueState, self).__setattr__('state_dict', {})
         super(DialogueState, self).__setattr__('history', [])
@@ -28,7 +28,7 @@ class DialogueState:
         })
         self.user = ''
         self.system = ''
-        self.nlu = None
+        self.nlu = DA()
 
     def set_system_response(self, response):
         self.system = response
@@ -44,6 +44,8 @@ class DialogueState:
             assert isinstance(value, str), f'Attribute "{key}" has to be of type "string"'
         elif key == 'eod':
             assert isinstance(value, bool), 'Attribute "eod" has to be of type "bool"'
+        elif key == 'nlu':
+            assert isinstance(value, DA), 'Attribute "nlu" has to be a dialmonkey.DA instance.'
         else:
             assert key not in ['history', 'state_dict'],\
                 'Modification of attribute "{}" is not allowed!'.format(key)

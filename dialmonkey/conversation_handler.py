@@ -83,7 +83,6 @@ class ConversationHandler(object):
             state.end_turn()
             # TODO: should we set maximum number of turns?
             eod = state.eod or \
-                len(user_utterance) == 0 or \
                 ('break_words' in self.conf and any([kw in user_utterance for kw in self.conf['break_words']]))
         self.logger.info('Dialogue ended.')
         for component in self.components:
