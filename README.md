@@ -1,4 +1,4 @@
-# ufal-dial
+# DialMonkey 🙊
 
 Minimalistic platform for dialogue system implementations.
 
@@ -13,7 +13,7 @@ The platform is based on the configuration file.
 An example of such file can be found in the `conf/` directory.
 
 To implement your pipeline, create new YAML file in the `conf/` directory and then run
-`python main.py --conf conf/your_pipeline.yaml`
+`python run_dialmonkey.py --conf conf/your_pipeline.yaml`
 
 Essential part of the configuration is the `components` list.
 You should provide one or more components that chain up to form your desired pipeline.
