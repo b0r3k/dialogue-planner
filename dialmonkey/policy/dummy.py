@@ -25,3 +25,12 @@ class DummyPolicy(Component):
 
     def reset(self):
         self.greeted = False
+
+
+class ReplyWithNLU(Component):
+
+    def __call__(self, dial, logger):
+        if dial['nlu'] and dial['nlu'][0].intent == 'goodbye' or len(dial['user']) == 0:
+            dial.end_dialogue()
+        dial.set_system_response(dial['nlu'].to_cambridge_da_string() or '<EMPTY>')
+        return dial
