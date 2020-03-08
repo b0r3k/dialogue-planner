@@ -21,18 +21,18 @@ You should provide one or more components that chain up to form your desired pip
 Each component has to inherit from the abstract class
 `dialmonkey.component.Component` and be located under one of the subdirectories in the `dialmonkey//` directory  for readability
 (e.g. NLU components should go under `dialmonkey/nlu/`).
-Components also need to implement `__call__()` method which takes a dialogue state, does the work and returns the modified state.
+Components also need to implement `__call__()` method which takes a dialogue object, does the work and returns the modified dialogue.
 
-The DialogueState object can be used as a mode of communication between components.
+The `Dialogue` object can be used as a mode of communication between components.
 The object supports dictionary-like indexing and you can add your own attributes.
 However, there are certain attributes that are mandatory and has to be present.
 Namely:
- - `state['user']`: User utterance, this attribute will be set for you. You should not need to modify it.
- - `state['system']`: Can be set via `DialogueState.set_system_response()`. It is mandatory to set this attribute at each turn in one of your components.
- - `state['nlu']`: A dictionary of NLU annotation, doesn't have to be used.
- - `state['state_dict']'`: A dictionary representing the dialogue state, should be used to keep the persistent values.
+ - `dialogue['user']`: User utterance, this attribute will be set for you. You should not need to modify it.
+ - `dialogue['system']`: Can be set via `Dialogue.set_system_response()`. It is mandatory to set this attribute at each turn in one of your components.
+ - `dialogue['nlu']`: A dictionary of NLU annotation, doesn't have to be used.
+ - `dialogue['state']'`: A dictionary representing the dialogue state, should be used to keep the persistent values.
  
-Do not forget to call `DialogueState.end_dialogue()` at some point.
+Do not forget to call `Dialogue.end_dialogue()` at some point.
 
 Each run will create a JSON file with the history of all the conversations.
 You can specify this file in configuration.

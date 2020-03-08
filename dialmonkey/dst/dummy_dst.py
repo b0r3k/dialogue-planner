@@ -2,13 +2,13 @@ from ..component import Component
 
 
 class DummyDST(Component):
-    def __call__(self, state, logger):
-        if state['nlu']:
-            state['state_dict']['intent'] = state['nlu'][0].intent   # assume just one intent
-            for dai in state['nlu']:
+    def __call__(self, dial, logger):
+        if dial['nlu']:
+            dial['state']['intent'] = dial['nlu'][0].intent   # assume just one intent
+            for dai in dial['nlu']:
                 if dai.slot:
-                    state['state_dict'][dai.slot] = dai.value
+                    dial['state_dict'][dai.slot] = dai.value
         else:
-            state['state_dict']['intent'] = None
-        logger.info('State: %s', str(state['state_dict']))
-        return state
+            dial['state']['intent'] = None
+        logger.info('State: %s', str(dial['state_dict']))
+        return dial

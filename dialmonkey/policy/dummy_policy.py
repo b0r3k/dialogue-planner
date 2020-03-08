@@ -6,22 +6,22 @@ class DummyPolicy(Component):
     def __init__(self):
         self.greeted = False
 
-    def __call__(self, state, logger):
-        if state['state_dict'].get('intent') == 'greet':
+    def __call__(self, dial, logger):
+        if dial['state'].get('intent') == 'greet':
             if not self.greeted:
-                state.set_system_response(choose_one(['Hello there', 'Hi!', 'G\'day mate', 'Good morning']))
+                dial.set_system_response(choose_one(['Hello there', 'Hi!', 'G\'day mate', 'Good morning']))
                 self.greeted = True
             else:
-                state.set_system_response('I said hello already.')
-        elif state['state_dict'].get('intent')  == 'goodbye':
-            state.set_system_response('See you next time!')
-            state.end_dialogue()
-        elif len(state['user']) == 0:
-            state.set_system_response('Empty input, ending the dialogue!')
-            state.end_dialogue()
+                dial.set_system_response('I said hello already.')
+        elif dial['state'].get('intent')  == 'goodbye':
+            dial.set_system_response('See you next time!')
+            dial.end_dialogue()
+        elif len(dial['user']) == 0:
+            dial.set_system_response('Empty input, ending the dialogue!')
+            dial.end_dialogue()
         else:
-            state.set_system_response('I don\'t know how to answer. I am just a dummy bot.')
-        return state
+            dial.set_system_response('I don\'t know how to answer. I am just a dummy bot.')
+        return dial
 
     def reset(self):
         self.greeted = False

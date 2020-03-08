@@ -1,24 +1,24 @@
 from abc import ABC, abstractmethod
 
-from .state import DialogueState
+from .dialogue import Dialogue
 
 
 class Component(ABC):
-    def init_state(self, state: DialogueState):
+    def init_dialogue(self, dial: Dialogue):
         """
-        Method that is called before the dialogue starts and can initialize the state object.
-        :param state: DialogueState instance that can be modified
-        :return: optionally modified DialogueState instance
+        Method that is called before the dialogue starts and can initialize the dialogue object.
+        :param dial: Dialogue instance that can be modified
+        :return: optionally modified Dialogue instance
         """
-        return state
+        return dial
 
     @abstractmethod
-    def __call__(self, state: DialogueState, logger):
+    def __call__(self, dial: Dialogue, logger):
         """
-        This method is called in every turn, takes the DialogueState, optionally modifies it and returns the result.
-        :param state: DialogueState instance
+        This method is called in every turn, takes the Dialogue, optionally modifies it and returns the result.
+        :param dial: Dialogue instance
         :param logger: logger reference, can be used for debugging purposes or verbose mode
-        :return: optionally modified DialogueState instance
+        :return: optionally modified Dialogue instance
         """
         pass
 

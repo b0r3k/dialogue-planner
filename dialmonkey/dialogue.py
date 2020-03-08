@@ -2,17 +2,15 @@ from copy import deepcopy
 from .da import DA
 
 
-# TODO: should we rename DialogueState -> Environment, state_dict -> dialogue_state ?
-# XXX: OD: yes, sounds better :-)
-class DialogueState:
+class Dialogue:
 
     def __init__(self):
         self.user = ''
         self.system = ''
         self.nlu = DA()
         self.eod = False
-        super(DialogueState, self).__setattr__('state_dict', {})
-        super(DialogueState, self).__setattr__('history', [])
+        super(Dialogue, self).__setattr__('state', {})
+        super(Dialogue, self).__setattr__('history', [])
 
     def end_turn(self):
         """
@@ -24,7 +22,7 @@ class DialogueState:
             'user': self.user,
             'system': self.system,
             'nlu': self.nlu,
-            'state_dict': deepcopy(self.state_dict)
+            'state': deepcopy(self.state)
         })
         self.user = ''
         self.system = ''
@@ -47,9 +45,9 @@ class DialogueState:
         elif key == 'nlu':
             assert isinstance(value, DA), 'Attribute "nlu" has to be a dialmonkey.DA instance.'
         else:
-            assert key not in ['history', 'state_dict'],\
+            assert key not in ['history', 'state'],\
                 'Modification of attribute "{}" is not allowed!'.format(key)
-        super(DialogueState, self).__setattr__(key, value)
+        super(Dialogue, self).__setattr__(key, value)
 
     def __setitem__(self, key, value):
         setattr(self, key, value)
@@ -63,7 +61,7 @@ class DialogueState:
     @staticmethod
     def essential_attributes():
         """
-        Essential attributes that has to be present in the valid DialogueState instance.
+        Essential attributes that has to be present in the valid Dialogue instance.
         :return: list of essential attributes
         """
-        return ['user', 'system', 'nlu', 'state_dict', 'history', 'eod']
+        return ['user', 'system', 'nlu', 'state', 'history', 'eod']
