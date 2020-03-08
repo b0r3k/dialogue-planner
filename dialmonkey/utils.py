@@ -32,7 +32,7 @@ def run_for_n_iterations(n: int) -> Callable:
     :param n: number of conversations
     :return: pointer to a function that allows to run exactly n conversations
     """
-    return lambda handler: handler.iterations < n
+    return lambda handler: handler.iterations <= n
 
 
 def run_forever() -> Callable:
