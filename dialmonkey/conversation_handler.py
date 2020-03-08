@@ -5,6 +5,7 @@ import time
 from .dialogue import Dialogue
 from .utils import dynload_class
 from .component import Component
+from .da import DA
 
 
 class ConversationHandler(object):
@@ -41,6 +42,12 @@ class ConversationHandler(object):
         and maintains the history.
         :return: None
         """
+        class JSONEnc(json.JSONEncoder):
+            """Helper class to ensure encoding of DA objects (as strings)."""
+            def default(self, obj):
+                if isinstance(obj, DA):
+                    return obj.to_cambridge_da_string()
+
         while self.should_continue(self):
             self.logger.debug('Dialogue %d', self.iterations)
             dial = Dialogue()
@@ -48,7 +55,7 @@ class ConversationHandler(object):
             self.history.append(final_dial['history'])
             self.iterations += 1
         with open(self.history_fn, 'wt') as of:
-            json.dump(self.history, of)
+            json.dump(self.history, of, indent=4, ensure_ascii=False, cls=JSONEnc)
 
     def run_dialogue(self, dial: Dialogue):
         """
