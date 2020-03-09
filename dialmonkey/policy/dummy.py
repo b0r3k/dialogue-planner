@@ -3,6 +3,9 @@ from ..utils import choose_one
 
 
 class DummyPolicy(Component):
+    """A dummy example policy that issues direct replies to greetings,
+    "I don't know" to everything else."""
+
     def __init__(self):
         self.greeted = False
 
@@ -28,6 +31,8 @@ class DummyPolicy(Component):
 
 
 class ReplyWithNLU(Component):
+    """A "policy" good for testing a NLU system in a stand-alone setting -- it will only
+    copy a textual representation of the NLU result into the system reply."""
 
     def __call__(self, dial, logger):
         if dial['nlu'] and dial['nlu'][0].intent == 'goodbye' or len(dial['user']) == 0:

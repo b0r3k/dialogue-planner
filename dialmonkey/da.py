@@ -1,12 +1,16 @@
 """
-Helper data structures
+Dialogue act (DA) representation classes. Note that DAs in Dialmonkey are composed
+of intent-slot-value triples, i.e., intents are slot-specific. In a typical case,
+all slots will carry the same intent, but there are cases when multiple intents are required.
+
+The code here is adapted from TGen (https://github.com/UFAL-DSG/tgen)
 """
 
 import re
 
 
 class DAI(object):
-    """Simple representation of a single dialogue act item."""
+    """Simple representation of a single dialogue act item (intent-slot-value triple)."""
 
     __slots__ = ['intent', 'slot', 'value']
 

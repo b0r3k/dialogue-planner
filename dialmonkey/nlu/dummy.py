@@ -3,6 +3,7 @@ from ..da import DAI
 
 
 class DummyNLU(Component):
+    """A dummy example NLU that is able to parse common greetings."""
 
     def __call__(self, dial, logger):
         if any([w in dial['user'] for w in ['hello', 'hey', 'hi', 'ola', 'ciao', 'ahoj']]):

@@ -3,6 +3,9 @@ from .da import DA
 
 
 class Dialogue:
+    """A representation of the dialogue -- dialogue history, current state, current system
+    and user utterances etc. This object is passed to dialogue components to be changed and
+    updated with new information."""
 
     def __init__(self):
         self.user = ''

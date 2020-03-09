@@ -9,6 +9,9 @@ from .da import DA
 
 
 class ConversationHandler(object):
+    """A helper class that calls the individual dialogue system components and thus
+    runs the whole dialogue. Its behavior is defined by the config file, the contents
+    of which are passed in the constructor."""
 
     def __init__(self, conf, logger, should_continue=None):
         self.conf = conf

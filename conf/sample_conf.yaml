@@ -1,3 +1,6 @@
+# A config that uses the example dummy NLU, tracker, and policy 
+# -- results in a chatbot that is able to reply to greetings
+# and nothing else.
 ---
 logging_level: "DEBUG"
 user_stream: "dialmonkey.input.console_input.ConsoleInput"
