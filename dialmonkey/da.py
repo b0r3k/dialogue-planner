@@ -164,7 +164,8 @@ class DA(object):
                 continue
 
             # we have some slots/values – split them into DAI
-            svps = re.findall('([^,;=\'"]+(?:=(?:[^"\',;]+))?)(?:[,;]|[\'"]$|$)', svps_text)
+            # (either slot or value must be non-empty here)
+            svps = re.findall('([^,;=\'"]*=[^"\',;]+|[^,;=\'"]+(?:=(?:[^"\',;]+))?)(?:[,;]|[\'"]$|$)', svps_text)
             for svp in svps:
 
                 if '=' not in svp:  # no value, e.g. '?request(near)'
@@ -173,6 +174,9 @@ class DA(object):
 
                 # we have a value
                 slot, value = svp.split('=', 1)
+                if slot == '':  # ignore empty slots
+                    da.append(DAI(intent))
+                    continue
                 if 'XXXQUOT%d' % quoted_num in value:  # get back the quoted value
                     value = re.sub('XXXQUOT%d' % quoted_num, quoted.pop(0), value, count=1)
                     quoted_num += 1
