@@ -1,4 +1,5 @@
 from dialmonkey.component import Component 
+from dialmonkey.da import DAI
 from itertools import chain
 import re
 
@@ -115,11 +116,8 @@ class SolarSystemNLU(Component):
         super().__init__(*args,**kwargs)
 
     def __call__(self, dial, logger):
-        for formatter in formatters:
-            result = formatter(dial['user'])
-            if result is not None:
-                dial['nlu'].append(DAI.parse(result))
-                break 
-
+        result = evaluate(dial['user'])
+        if result is not None:
+            dial['nlu'].append(DAI.parse(result))
         logger.info('NLU: %s', str(dial['nlu']))
         return dial
