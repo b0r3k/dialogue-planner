@@ -10,8 +10,8 @@ class DummyDST(Component):
             dial['state']['intent'] = dial['nlu'][0].intent   # assume just one intent
             for dai in dial['nlu']:
                 if dai.slot:
-                    dial['state_dict'][dai.slot] = dai.value
+                    dial['state'][dai.slot] = dai.value
         else:
             dial['state']['intent'] = None
-        logger.info('State: %s', str(dial['state_dict']))
+        logger.info('State: %s', str(dial['state']))
         return dial
