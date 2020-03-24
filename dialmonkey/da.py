@@ -12,20 +12,21 @@ import re
 class DAI(object):
     """Simple representation of a single dialogue act item (intent-slot-value triple)."""
 
-    __slots__ = ['intent', 'slot', 'value']
+    __slots__ = ['intent', 'slot', 'value', 'confidence']
 
-    def __init__(self, intent, slot=None, value=None):
+    def __init__(self, intent, slot=None, value=None, confidence=1.0):
         self.intent = intent
         self.slot = slot
         self.value = value
+        self.confidence = confidence
 
     def __str__(self):
-        if self.slot is None:
-            return self.intent + '()'
-        if self.value is None:
-            return self.intent + '(' + self.slot + ')'
-        quote = '\'' if (' ' in self.value or ':' in self.value) else ''
-        return self.intent + '(' + self.slot + '=' + quote + self.value + quote + ')'
+        intn_str = str(self.intent)
+        slot_str = '(' + (self.slot if self.slot is not None else '')
+        quote = '\'' if (self.value is not None and (' ' in self.value or ':' in self.value)) else ''
+        val_str = (('=' + quote + self.value + quote) if self.value is not None else '') + ')'
+        conf_str = '/%.3f' % self.confidence if self.confidence != 1.0 else ''
+        return intn_str + slot_str + val_str + conf_str
 
     def __bytes__(self):
         return str(self).encode('ascii', errors='replace')
@@ -64,20 +65,25 @@ class DAI(object):
 
     @staticmethod
     def parse(dai_text):
+        m = re.search(r'/([0-9\.]+)$', dai_text)
+        conf = 1.0
+        if m:
+            dai_text = dai_text[:m.start()]
+            conf = float(m.group(1))
         intent, svp = dai_text[:-1].split('(', 1)
 
         if not svp:  # no slot + value (e.g. 'hello()')
-            return DAI(intent)
+            return DAI(intent, confidence=conf)
 
         if '=' not in svp:  # no value (e.g. 'request(to_stop)')
-            return DAI(intent, svp)
+            return DAI(intent, svp, confidence=conf)
 
         slot, value = svp.split('=', 1)
         if value.endswith('"#'):  # remove special '#' characters in Bagel data (TODO treat right)
             value = value[:-1]
         if value[0] in ['"', '\'']:  # remove quotes
             value = value[1:-1]
-        return DAI(intent, slot, value)
+        return DAI(intent, slot, value, conf)
 
 
 class DA(object):

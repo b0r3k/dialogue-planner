@@ -108,11 +108,15 @@ class ConversationHandler(object):
         if 'components' not in self.conf:
             return
         for comp in self.conf['components']:
-            component_cls = dynload_class(comp)
+            if isinstance(comp, dict):  # component has some configuration options (key=name, value=options)
+                comp_name, comp_params = next(iter(comp.items()))
+            else:  # component has no configuration options
+                comp_name, comp_params = comp, None
+            component_cls = dynload_class(comp_name)
             if component_cls is None:
                 self.logger.error('Could not find class "%s"', comp)
             else:
-                component = component_cls()
+                component = component_cls(comp_params)
                 assert isinstance(component, Component),\
                     'Provided component has to inherit from the abstract class components.Component'
                 self.components.append(component)
