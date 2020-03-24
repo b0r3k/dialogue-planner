@@ -118,7 +118,7 @@ class SolarSystemNLU(Component):
         for formatter in formatters:
             result = formatter(dial['user'])
             if result is not None:
-                dial['nlu'].append(DAI.parse(result))
+                dial['nlu'].append(DA.parse_cambridge_da(result))
                 break 
 
         logger.info('NLU: %s', str(dial['nlu']))
