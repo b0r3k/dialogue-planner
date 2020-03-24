@@ -49,7 +49,7 @@ class Dialogue:
             assert isinstance(value, DA), 'Attribute "nlu" has to be a dialmonkey.DA instance.'
         else:
             assert key not in ['history', 'state'],\
-                'Modification of attribute "{}" is not allowed!'.format(key)
+                'Direct modification of attribute "{}" is not allowed!'.format(key)
         super(Dialogue, self).__setattr__(key, value)
 
     def __setitem__(self, key, value):

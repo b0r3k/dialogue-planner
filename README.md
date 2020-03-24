@@ -19,7 +19,7 @@ Essential part of the configuration is the `components` list.
 You should provide one or more components that chain up to form your desired pipeline.
 
 Each component has to inherit from the abstract class
-`dialmonkey.component.Component` and be located under one of the subdirectories in the `dialmonkey//` directory  for readability
+`dialmonkey.component.Component` and be located under one of the subdirectories in the `dialmonkey/` directory  for readability
 (e.g. NLU components should go under `dialmonkey/nlu/`).
 Components also need to implement `__call__()` method which takes a dialogue object, does the work and returns the modified dialogue.
 

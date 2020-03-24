@@ -1,0 +1,13 @@
+# A config useful for testing NLU systems -- now set up with the
+# dummy NLU. Replace the NLU model with your NLU to test it on
+# the console.
+---
+logging_level: "DEBUG"
+user_stream: "dialmonkey.input.console_input.ConsoleInput"
+components:
+  - "dialmonkey.nlu.dummy.DummyNLU"
+  - "dialmonkey.dst.dummy.DummyDST"
+  - "dialmonkey.policy.dummy.ReplyWithState"
+break_words:
+  - "quit"
+  - "exit"
