@@ -18,9 +18,9 @@ def load_conf(conf_path: str) -> dict:
     return conf
 
 
-def setup_logging(conf: dict):
+def setup_logging(logging_level):
+    """Setup logger with the given logging level."""
     logger = logging.getLogger(__name__)
-    logging_level = conf['logging_level'] if 'logging_level' in conf else 'NOTSET'
     logging.basicConfig(level=logging_level, format='%(asctime)-15s %(message)s')
     return logger
 
