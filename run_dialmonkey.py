@@ -21,9 +21,11 @@ def main(args):
         conf['logging_level'] = 'NOTSET'
     logger = setup_logging(conf['logging_level'])
 
-    # setup input stream
+    # setup input & output streams
     if args.user_stream:
         conf['user_stream'] = args.user_stream
+    if args.output_stream:
+        conf['output_stream'] = args.output_stream
     # run the conversation(s)
     handler = ConversationHandler(conf, logger, should_continue=run_for_n_iterations(args.num_dials))
     handler.main_loop()
@@ -40,6 +42,7 @@ if __name__ == '__main__':
                         help='Logging level/verbosity (overriding config defaults)')
     parser.add_argument('-i', '--user-stream', '--input-stream', '--input', type=str,
                         help='Component class to use as input stream (overriding config defaults)')
-
+    parser.add_argument('-o', '--output-stream', '--output', type=str,
+                        help='Component class to use as output stream (overriding config defaults)')
     args = parser.parse_args()
     main(args)

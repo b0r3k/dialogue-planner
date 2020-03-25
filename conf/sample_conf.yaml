@@ -1,12 +1,15 @@
-# A config that uses the example dummy NLU, tracker, and policy 
+# A config that uses the example dummy NLU, tracker, and policy
 # -- results in a chatbot that is able to reply to greetings
 # and nothing else.
 ---
-logging_level: "DEBUG"
-user_stream: "dialmonkey.input.console_input.ConsoleInput"
+logging_level: "DEBUG"  # not strictly required
+user_stream: "dialmonkey.input.text.ConsoleInput"  # not strictly required
+output_stream: "dialmonkey.output.text.ConsoleOutput"  # not strictly required
 components:
-  - "dialmonkey.nlu.dummy.DummyNLU"
-  - "dialmonkey.dst.dummy.DummyDST"
+  - "dialmonkey.nlu.dummy.DummyNLU":  # any component can have parameters (a dict)
+      param1: value1  # (they're not actually used in this case)
+      param2: value2
+  - "dialmonkey.dst.dummy.DummyDST"  # the parameters are not compulsory
   - "dialmonkey.policy.dummy.DummyPolicy"
 break_words:
   - "quit"

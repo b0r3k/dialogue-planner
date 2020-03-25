@@ -3,7 +3,6 @@
 # the console.
 ---
 logging_level: "DEBUG"
-user_stream: "dialmonkey.input.console_input.ConsoleInput"
 components:
   - "dialmonkey.nlu.dummy.DummyNLU"
   - "dialmonkey.dst.dummy.DummyDST"

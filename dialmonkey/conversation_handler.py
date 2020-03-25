@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import logging
 import json
 import time
@@ -24,16 +26,22 @@ class ConversationHandler(object):
             self.should_continue = should_continue
         else:
             self.should_continue = lambda _: True
-        stream_loaded = False
-        if 'user_stream' in self.conf:
-            user_stream_cls = dynload_class(self.conf['user_stream'])
-            if user_stream_cls is None:
-                self.logger.error('Could not find class "%s"', self.conf['user_stream'])
-            else:
-                self.user_stream = user_stream_cls()
-                stream_loaded = True
-        if not stream_loaded:
-            self.user_stream = lambda _:  input('USER> ').strip().lower()
+
+        # setup input stream
+        if 'user_stream' not in self.conf:
+            self.conf['user_stream'] = 'dialmonkey.input.text.ConsoleInput'
+        try:
+            self.user_stream = dynload_class(self.conf['user_stream'])()
+        except:
+            self.logger.error('Could not load class "%s"', self.conf['user_stream'])
+
+        # setup output stream
+        if 'output_stream' not in self.conf:
+            self.conf['output_stream'] = 'dialmonkey.output.text.ConsoleOutput'
+        try:
+            self.output_stream = dynload_class(self.conf['output_stream'])()
+        except:
+            self.logger.error('Could not load class "%s"', self.conf['output_stream'])
 
         self._load_components()
         self._reset()
@@ -76,10 +84,12 @@ class ConversationHandler(object):
         for component in self.components:
             dial = component.init_dialogue(dial)
         while not eod:
+            # get a user utterance from the input stream
             time.sleep(.05)
             user_utterance = self.user_stream(last_system)
             self.logger.info('USER: %s', user_utterance)
             dial.set_user_input(user_utterance)
+            # run the dialogue pipeline (all components from the config)
             for component in self.components:
                 dial = component(dial, self.logger)
                 ConversationHandler._assert_is_valid_dial(dial)
@@ -87,9 +97,10 @@ class ConversationHandler(object):
                 # TODO: should be assert here?
                 logging.error('System response not filled by the pipeline!')
                 break
+            # print system response to the output stream
             last_system = dial['system']
-            print('SYSTEM:', last_system)
             self.logger.info('SYSTEM: %s', last_system)
+            self.output_stream(last_system)
             dial.end_turn()
             # TODO: should we set maximum number of turns?
             eod = dial.eod or \
