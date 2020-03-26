@@ -31,15 +31,16 @@ class ConversationHandler(object):
         if 'user_stream' not in self.conf:
             self.conf['user_stream'] = 'dialmonkey.input.text.ConsoleInput'
         try:
-            self.user_stream = dynload_class(self.conf['user_stream'])()
-        except:
+            self.user_stream = dynload_class(self.conf['user_stream'])(self.conf)
+        except Exception as e:
+            print(e)
             self.logger.error('Could not load class "%s"', self.conf['user_stream'])
 
         # setup output stream
         if 'output_stream' not in self.conf:
             self.conf['output_stream'] = 'dialmonkey.output.text.ConsoleOutput'
         try:
-            self.output_stream = dynload_class(self.conf['output_stream'])()
+            self.output_stream = dynload_class(self.conf['output_stream'])(self.conf)
         except:
             self.logger.error('Could not load class "%s"', self.conf['output_stream'])
 
