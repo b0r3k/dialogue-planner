@@ -15,12 +15,12 @@ class ConversationHandler(object):
     runs the whole dialogue. Its behavior is defined by the config file, the contents
     of which are passed in the constructor."""
 
-    def __init__(self, conf, logger, should_continue=None):
-        self.conf = conf
+    def __init__(self, config, logger, should_continue=None):
+        self.config = config
         self.logger = logger
-        self.logging_level = 'DEBUG' if 'logging_level' not in self.conf else self.conf['logging_level']
+        self.logging_level = 'DEBUG' if 'logging_level' not in self.config else self.config['logging_level']
         self.history_fn = 'history-{}.json'.format(int(time.time())) \
-            if 'history_fn' not in self.conf else self.conf['history_fn']
+            if 'history_fn' not in self.config else self.config['history_fn']
         self._setup_logging()
         if should_continue is not None:
             self.should_continue = should_continue
@@ -28,21 +28,22 @@ class ConversationHandler(object):
             self.should_continue = lambda _: True
 
         # setup input stream
-        if 'user_stream' not in self.conf:
-            self.conf['user_stream'] = 'dialmonkey.input.text.ConsoleInput'
+        if 'user_stream_type' not in self.config:
+            self.config['user_stream_type'] = 'dialmonkey.input.text.ConsoleInput'
         try:
-            self.user_stream = dynload_class(self.conf['user_stream'])(self.conf)
+            self.user_stream = dynload_class(self.config['user_stream_type'])(self.config)
         except Exception as e:
-            print(e)
-            self.logger.error('Could not load class "%s"', self.conf['user_stream'])
+            self.logger.error('Could not load class "%s"', self.config['user_stream_type'])
+            raise e
 
         # setup output stream
-        if 'output_stream' not in self.conf:
-            self.conf['output_stream'] = 'dialmonkey.output.text.ConsoleOutput'
+        if 'output_stream_type' not in self.config:
+            self.config['output_stream_type'] = 'dialmonkey.output.text.ConsoleOutput'
         try:
-            self.output_stream = dynload_class(self.conf['output_stream'])(self.conf)
-        except:
-            self.logger.error('Could not load class "%s"', self.conf['output_stream'])
+            self.output_stream = dynload_class(self.config['output_stream_type'])(self.config)
+        except Exception as e:
+            self.logger.error('Could not load class "%s"', self.config['output_stream_type'])
+            raise e
 
         self._load_components()
         self._reset()
@@ -105,7 +106,7 @@ class ConversationHandler(object):
             dial.end_turn()
             # TODO: should we set maximum number of turns?
             eod = dial.eod or \
-                ('break_words' in self.conf and any([kw in user_utterance for kw in self.conf['break_words']]))
+                ('break_words' in self.config and any([kw in user_utterance for kw in self.config['break_words']]))
         self.logger.info('Dialogue ended.')
         for component in self.components:
             component.reset()
@@ -117,9 +118,9 @@ class ConversationHandler(object):
 
     def _load_components(self):
         self.components = []
-        if 'components' not in self.conf:
+        if 'components' not in self.config:
             return
-        for comp in self.conf['components']:
+        for comp in self.config['components']:
             if isinstance(comp, dict):  # component has some configuration options (key=name, value=options)
                 comp_name, comp_params = next(iter(comp.items()))
             else:  # component has no configuration options
@@ -139,8 +140,8 @@ class ConversationHandler(object):
         if `logging_fn` is set, logger output is forked to the respective file.
         :return:
         """
-        if 'logging_fn' in self.conf:
-            file_handler = logging.FileHandler(self.conf['logging_fn'])
+        if 'logging_fn' in self.config:
+            file_handler = logging.FileHandler(self.config['logging_fn'])
             self.logger.addHandler(file_handler)
         for handler in self.logger.handlers:
             handler.setLevel(getattr(logging, self.logging_level))

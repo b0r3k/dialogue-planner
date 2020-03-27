@@ -6,11 +6,11 @@ from .dialogue import Dialogue
 class Component(ABC):
     """A base class for all dialogue system components (NLU, trackers, policies etc.)."""
 
-    def __init__(self, cfg=None):
+    def __init__(self, config=None):
         """
         Default constructor: just save the provided configuration.
         """
-        self.cfg = cfg
+        self.config = config
 
     def init_dialogue(self, dial: Dialogue):
         """

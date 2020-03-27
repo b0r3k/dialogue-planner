@@ -6,8 +6,8 @@ class DummyPolicy(Component):
     """A dummy example policy that issues direct replies to greetings,
     "I don't know" to everything else."""
 
-    def __init__(self, cfg=None):
-        super(DummyPolicy, self).__init__(cfg)
+    def __init__(self, config=None):
+        super(DummyPolicy, self).__init__(config)
         self.greeted = False
 
     def __call__(self, dial, logger):

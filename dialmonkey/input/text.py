@@ -2,32 +2,40 @@
 
 import sys
 import json
+from ..component import Component
 
 
-class ConsoleInput(object):
-
-    def __init__(self, *args):
-        super(ConsoleInput, self).__init__()
+class ConsoleInput(Component):
+    """Input from the console, following a text prompt."""
 
     def __call__(self, *args, **kwargs):
         return input('USER INPUT> ').strip().lower()
 
 
-class FileInput(object):
+class FileInput(Component):
+    """Input from a file, default to standard input (one turn per line)."""
 
-    def __init__(self, *args):
-        super(FileInput, self).__init__()
+    def __init__(self, config=None):
+        super(FileInput, self).__init__(config)
+        self.input_fd = sys.stdin
+        # input is not from standard input
+        if self.config and 'input_file' in self.config and 'input_file' not in ['', '-']:
+            self.input_fd = open(self.config['input_file'], 'r', encoding='UTF-8')
 
     def __call__(self, *args, **kwargs):
-        return sys.stdin.readline().strip().lower()
+        return self.input_fd.readline().strip().lower()
+
+    def __del__(self):
+        self.input_fd.close()
 
 
-class SimpleJSONInput(object):
+class SimpleJSONInput(Component):
+    """Input from a JSON, expected format: list of dictionaries, using the
+    'usr' key to provide as the input."""
 
-    def __init__(self, config, *args):
-        super(SimpleJSONInput, self).__init__()
-        self.config = config
-        with open(self.config['input_data_fn'], 'rt') as fd:
+    def __init__(self, config=None):
+        super(SimpleJSONInput, self).__init__(config)
+        with open(self.config['input_file'], 'rt', encoding='UTF-8') as fd:
             self.data = json.load(fd)
         self.gen = self.get_data_gen()
 
