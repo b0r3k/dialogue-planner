@@ -44,8 +44,8 @@ class SimpleJSONInput(Component):
             yield x
 
     def __call__(self, *args, **kwargs):
-        x = next(self.gen)
-        if x is not None:
+        try:
+            x = next(self.gen)
             return x['usr']
-        else:
+        except (StopIteration, KeyError):
             return ''
