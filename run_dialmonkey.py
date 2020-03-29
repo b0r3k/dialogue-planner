@@ -23,11 +23,11 @@ def main(args):
 
     # setup input & output streams
     if args.user_stream_type:
-        conf['user_stream_type'] = args.user_stream
+        conf['user_stream_type'] = args.user_stream_type
     if args.input_file:
         conf['input_file'] = args.input_file
     if args.output_stream_type:
-        conf['output_stream_type'] = args.output_stream
+        conf['output_stream_type'] = args.output_stream_type
     if args.output_file:
         conf['output_file'] = args.output_file
     # run the conversation(s)
