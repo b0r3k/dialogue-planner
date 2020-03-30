@@ -1,0 +1,12 @@
+# Author: Matej Mik
+# A config for testing the basketball NLU system.
+---
+logging_level: "DEBUG"
+user_stream: "dialmonkey.input.console_input.ConsoleInput"
+components:
+  - "dialmonkey.nlu.basketball.DummyNLU" #TODO
+  - "dialmonkey.policy.dummy.ReplyWithNLU"
+break_words:
+  - "quit"
+  - "exit"
+  - "konec"
