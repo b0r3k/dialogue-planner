@@ -98,6 +98,9 @@ class DA(object):
     def __setitem__(self, idx, value):
         self.dais[idx] = value
 
+    def __delitem__(self, idx):
+        del self.dais[idx]
+
     def append(self, value):
         self.dais.append(value)
 
@@ -129,6 +132,19 @@ class DA(object):
 
     def sort(self):
         self.dais.sort()
+
+    def merge_duplicate_dais(self, merge_conf=max):
+        """Merge DAIs with the same intent-slot-value values. The confidence
+        is manipulated by the merge_conf function (defaults to `max`)."""
+        self.sort()
+        pos = 0
+        while pos < len(self.dais) - 1:
+            if self[pos] == self[pos + 1]:
+                conf = merge_conf([self[pos].confidence, self[pos + 1].confidence])
+                self[pos].confidence = conf
+                del self[pos]
+            else:
+                pos += 1
 
     @staticmethod
     def parse(da_text):
