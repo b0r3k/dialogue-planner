@@ -4,7 +4,7 @@
 logging_level: "DEBUG"
 user_stream: "dialmonkey.input.console_input.ConsoleInput"
 components:
-  - "dialmonkey.nlu.basketball.DummyNLU" #TODO
+  - "dialmonkey.nlu.basketball.BasketballNLU"
   - "dialmonkey.policy.dummy.ReplyWithNLU"
 break_words:
   - "quit"
