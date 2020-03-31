@@ -3,12 +3,14 @@
 import sys
 import json
 from ..component import Component
+import time
 
 
 class ConsoleInput(Component):
     """Input from the console, following a text prompt."""
 
     def __call__(self, *args, **kwargs):
+        time.sleep(.05)
         return input('USER INPUT> ').strip().lower()
 
 

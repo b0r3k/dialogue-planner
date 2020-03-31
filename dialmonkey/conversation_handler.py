@@ -87,7 +87,6 @@ class ConversationHandler(object):
             dial = component.init_dialogue(dial)
         while not eod:
             # get a user utterance from the input stream
-            time.sleep(.05)
             user_utterance = self.user_stream(last_system)
             self.logger.info('USER: %s', user_utterance)
             dial.set_user_input(user_utterance)
