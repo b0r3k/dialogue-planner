@@ -20,7 +20,7 @@ class KulhanekNLU(Component):
         return result
 
     def __call__(self, dial, logger): 
-        all_hypothesis = self._classify_text(dial['user'], self.cfg.get('probability_treshold', 0.5), self.cfg.get('nalternatives', None))
+        all_hypothesis = self._classify_text(dial['user'], self.config.get('probability_treshold', 0.5), self.config.get('nalternatives', None))
         for dia, p in all_hypothesis:
             dial['nlu'].append(DAI(*dia, confidence=p)) 
 
