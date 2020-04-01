@@ -4,11 +4,15 @@ Minimalistic platform for dialogue system implementations.
 
 # Installation
 
-Clone the repo and `pip install -r requirements.txt`
-The code is written in Python 3.
+Dialmonkey requires Python 3 and [pip](https://pypi.org/project/pip/).
 
-To use dialmonkey as a set of libraries (e.g. import packages from it), you can
-do an in-place install of the cloned repo:
+For a basic installation, clone the repository and run:
+```
+cd dialmonkey; pip install -r requirements.txt
+```
+
+If you also want to use dialmonkey as a set of libraries (e.g. import packages from it), you can
+do a full in-place install of the cloned repository:
 ```
 cd dialmonkey; pip install [--user] -e .
 ```
