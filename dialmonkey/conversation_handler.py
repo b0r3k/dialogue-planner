@@ -88,6 +88,9 @@ class ConversationHandler(object):
         while not eod:
             # get a user utterance from the input stream
             user_utterance = self.user_stream(last_system)
+            if user_utterance is None:
+                logging.info('Input file ended.')
+                break
             self.logger.info('USER: %s', user_utterance)
             dial.set_user_input(user_utterance)
             # run the dialogue pipeline (all components from the config)
