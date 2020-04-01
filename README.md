@@ -36,14 +36,19 @@ Each component has to inherit from the abstract class
 (e.g. NLU components should go under `dialmonkey/nlu/`).
 Components also need to implement `__call__()` method which takes a dialogue object, does the work and returns the modified dialogue.
 
-The `Dialogue` object can be used as a mode of communication between components.
+The `Dialogue` object is used as a mode of communication between components.
 The object supports dictionary-like indexing and you can add your own attributes.
-However, there are certain attributes that are mandatory and has to be present.
+However, there are certain conventionally used attributes, some of them mandatory.
 Namely:
- - `dialogue['user']`: User utterance, this attribute will be set for you. You should not need to modify it.
- - `dialogue['system']`: Can be set via `Dialogue.set_system_response()`. It is mandatory to set this attribute at each turn in one of your components.
- - `dialogue['nlu']`: A dictionary of NLU annotation, doesn't have to be used.
- - `dialogue['state']'`: A dictionary representing the dialogue state, should be used to keep the persistent values.
+ - `dialogue['user']`: Input user utterance for the current turn. This attribute will be set for you by the 
+   [conversation handler](dialmonkey/conversation_handler.py). You should not need to modify it.
+ - `dialogue['nlu']`: NLU annotation (a [`DA`](dialmonkey/da.py) object), doesn't have to be used.
+ - `dialogue['state']'`: A dictionary representing the dialogue state, should be used to keep the persistent values
+   (but isnt' mandatory).
+ - `dialogue['action']`: A system action representation (a [`DA`](dialmonkey/da.py) object), doesn't have to be used.
+ - `dialogue['system']`: The final system response in natural language, can be set using 
+   [`Dialogue.set_system_response()`](dialmonkey/dialogue.py). It is mandatory to set this attribute at each 
+   turn in one of your components.
  
 Do not forget to call `Dialogue.end_dialogue()` at some point.
 
