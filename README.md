@@ -16,7 +16,8 @@ do a full in-place install of the cloned repository:
 ```
 cd dialmonkey; pip install [--user] -e .
 ```
-Use `--user` to install into your user directories (recommended unless you're using a virtualenv or conda).
+Use `--user` to install into your user directories (recommended unless you're using 
+a [virtualenv](https://virtualenv.pypa.io/en/latest/) or [conda](https://docs.conda.io/en/latest/)).
 
 
 # Usage
