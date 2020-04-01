@@ -7,6 +7,14 @@ Minimalistic platform for dialogue system implementations.
 Clone the repo and `pip install -r requirements.txt`
 The code is written in Python 3.
 
+To use dialmonkey as a set of libraries (e.g. import packages from it), you can
+do an in-place install of the cloned repo:
+```
+cd dialmonkey; pip install [--user] -e .
+```
+Use `--user` to install into your user directories (recommended unless you're using a virtualenv or conda).
+
+
 # Usage
 
 The platform is based on the configuration file.
@@ -39,3 +47,9 @@ You can specify this file in configuration.
 
 For further details refer to the code.
 Have fun!
+
+
+# Licence
+
+© Institute of Formal and Applied Linguistics, Charles University, Prague, 2020.
+Licenced under the Apache 2.0 licence.
