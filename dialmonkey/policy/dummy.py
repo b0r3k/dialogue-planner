@@ -11,16 +11,16 @@ class DummyPolicy(Component):
         self.greeted = False
 
     def __call__(self, dial, logger):
-        if dial['state'].get('intent') == 'greet':
+        if dial.state.get('intent') == 'greet':
             if not self.greeted:
                 dial.set_system_response(choose_one(['Hello there', 'Hi!', 'G\'day mate', 'Good morning']))
                 self.greeted = True
             else:
                 dial.set_system_response('I said hello already.')
-        elif dial['state'].get('intent')  == 'goodbye':
+        elif dial.state.get('intent')  == 'goodbye':
             dial.set_system_response('See you next time!')
             dial.end_dialogue()
-        elif len(dial['user']) == 0:
+        elif len(dial.user) == 0:
             dial.set_system_response('Empty input, ending the dialogue!')
             dial.end_dialogue()
         else:
@@ -36,18 +36,30 @@ class ReplyWithNLU(Component):
     copy a textual representation of the NLU result into the system reply."""
 
     def __call__(self, dial, logger):
-        if len(dial['user']) == 0:
+        if len(dial.user) == 0:
             dial.end_dialogue()
-        dial.set_system_response(dial['nlu'].to_cambridge_da_string() or '<EMPTY>')
+        dial.set_system_response(dial.nlu.to_cambridge_da_string() or '<EMPTY>')
         return dial
+
 
 class ReplyWithState(Component):
     """A "policy" good for testing a dialogue state tracker in a stand-alone setting -- it will only
     copy a textual representation of the current dialogue state into the system reply."""
 
     def __call__(self, dial, logger):
-        if len(dial['user']) == 0:
+        if len(dial.user) == 0:
             dial.end_dialogue()
-        dial.set_system_response(str(dial['state']))
+        dial.set_system_response(str(dial.state))
+        return dial
+
+
+class ReplyWithSystemAction(Component):
+    """A "policy" good for testing a dialogue state tracker in a stand-alone setting -- it will only
+    copy a textual representation of the current dialogue state into the system reply."""
+
+    def __call__(self, dial, logger):
+        if len(dial.user) == 0:
+            dial.end_dialogue()
+        dial.set_system_response(dial.action.to_cambridge_da_string() or '<EMPTY>')
         return dial
 

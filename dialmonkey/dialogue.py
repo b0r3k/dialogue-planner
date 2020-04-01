@@ -26,8 +26,8 @@ class Dialogue:
             'user': self.user,
             'system': self.system,
             'nlu': self.nlu,
-            'state': deepcopy(self.state)
-            'action': self.action
+            'state': deepcopy(self.state),
+            'action': self.action,
         })
         self.user = ''
         self.system = ''
