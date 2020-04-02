@@ -10,6 +10,8 @@ class Component(ABC):
         """
         Default constructor: just save the provided configuration.
         """
+        if config is None:
+            config = {}
         self.config = config
 
     def init_dialogue(self, dial: Dialogue):
