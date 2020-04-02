@@ -4,6 +4,8 @@
 logging_level: "DEBUG"
 user_stream: "dialmonkey.input.console_input.ConsoleInput"
 components:
+  - dialmonkey.preprocessing.tokenize.Tokenizer:
+      language: cs
   - "dialmonkey.nlu.basketball.BasketballNLU"
   - "dialmonkey.policy.dummy.ReplyWithNLU"
 break_words:

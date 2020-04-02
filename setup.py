@@ -12,7 +12,11 @@ setup(
     url='https://gitlab.com/ufal/dsg/dialmonkey',
     download_url='https://gitlab.com/ufal/dsg/dialmonkey.git',
     license='Apache 2.0',
-    install_requires=['pyyaml'],
+    install_requires=['pyyaml',
+                      'cloudpickle',
+                      'sklearn',
+                      'unidecode',
+                      'regex'],
     packages=find_packages()
 )
 

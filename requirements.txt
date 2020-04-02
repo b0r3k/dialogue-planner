@@ -1,2 +1,5 @@
 pyyaml
 cloudpickle
+sklearn
+unidecode
+regex
