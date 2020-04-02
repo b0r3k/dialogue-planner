@@ -150,8 +150,8 @@ class DA(object):
     def parse(da_text):
         """Parse a DA string into DAIs (DA types, slots, and values)."""
         da = DA()
-        for dai_text in da_text[:-1].split(')&'):
-            da.append(DAI.parse(dai_text + ')'))
+        for dai_text in da_text.split('&'):
+            da.append(DAI.parse(dai_text))
         return da
 
     class TagQuotes(object):
