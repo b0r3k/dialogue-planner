@@ -118,7 +118,7 @@ class SolarSystemNLU(Component):
     def __call__(self, dial, logger):
         result = evaluate(dial['user'])
         if result is not None:
-            dial['nlu'].append(DA.parse_cambridge_da(result))
+            dial['nlu'] = DA.parse_cambridge_da(result)
 
         logger.info('NLU: %s', str(dial['nlu']))
         return dial

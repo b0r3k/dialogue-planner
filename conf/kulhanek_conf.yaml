@@ -2,11 +2,12 @@
 # dummy NLU. Replace the NLU model with your NLU to test it on
 # the console.
 ---
-logging_level: "DEBUG"
+logging_level: "DEBUG" 
 components:
   - "dialmonkey.nlu.kulhanek.KulhanekNLU":
      probability_treshold: 0.5
-  - "dialmonkey.policy.dummy.ReplyWithNLU"
+  - "dialmonkey.dst.rule_kulhanek.KulhanekDST"
+  - "dialmonkey.policy.dummy.ReplyWithState"
 break_words:
   - "quit"
   - "exit"
