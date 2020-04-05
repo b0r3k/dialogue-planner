@@ -8,9 +8,9 @@ from argparse import ArgumentParser
 
 
 app = Flask(__name__)
-app.secret_key = b'48375ouhd2$&#&$HEDU'  # replace this before using
+app.secret_key = b'445234uedoeh#&$HEDU'  # replace this before using
 
-WORKER_ADDRS = ['http://localhost:8123']
+WORKER_ADDRS = ['http://localhost:8123', 'http://localhost:8124']
 TIMEOUT = 60
 
 
@@ -32,6 +32,8 @@ class Workers:
                     worker = w
                     break
         if worker:
+            if worker['sessid'] in self.sessid_to_worker:
+                del self.sessid_to_worker[worker['sessid']]
             self.sessid_to_worker[sessid] = worker
             worker['sessid'] = sessid
             worker['last_used'] = now
