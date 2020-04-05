@@ -4,12 +4,13 @@ import time
 import uuid
 import requests
 from flask import Flask, send_from_directory, send_file, session, request, jsonify, abort
+from argparse import ArgumentParser
 
 
 app = Flask(__name__)
 app.secret_key = b'48375ouhd2$&#&$HEDU'
 
-WORKER_ADDRS = ['http://localhost:5001']
+WORKER_ADDRS = ['http://localhost:8123']
 TIMEOUT = 60
 
 
@@ -65,4 +66,7 @@ def return_index():
 
 
 if __name__ == '__main__':
-    app.run()
+    ap = ArgumentParser()
+    ap.add_argument('-p', '--port', type=int, default=8122)
+    args = ap.parse_args()
+    app.run(host='localhost', port=args.port)
