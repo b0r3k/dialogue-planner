@@ -8,7 +8,7 @@ from argparse import ArgumentParser
 
 
 app = Flask(__name__)
-app.secret_key = b'48375ouhd2$&#&$HEDU'
+app.secret_key = b'48375ouhd2$&#&$HEDU'  # replace this before using
 
 WORKER_ADDRS = ['http://localhost:8123']
 TIMEOUT = 60
