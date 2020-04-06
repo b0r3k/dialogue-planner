@@ -11,13 +11,13 @@ class DummyPolicy(Component):
         self.greeted = False
 
     def __call__(self, dial, logger):
-        if dial.state.get('intent') == 'greet':
+        if dial.state.intent == 'greet':
             if not self.greeted:
                 dial.set_system_response(choose_one(['Hello there', 'Hi!', 'G\'day mate', 'Good morning']))
                 self.greeted = True
             else:
                 dial.set_system_response('I said hello already.')
-        elif dial.state.get('intent')  == 'goodbye':
+        elif dial.state.intent == 'goodbye':
             dial.set_system_response('See you next time!')
             dial.end_dialogue()
         elif len(dial.user) == 0:
