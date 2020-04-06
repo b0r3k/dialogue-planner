@@ -74,3 +74,4 @@ def dynload_class(path: str) -> Callable:
     """
     cls = pydoc.locate(path)
     return cls
+

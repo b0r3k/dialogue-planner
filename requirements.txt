@@ -3,3 +3,4 @@ cloudpickle
 sklearn
 unidecode
 regex
+tqdm
