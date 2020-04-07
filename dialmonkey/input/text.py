@@ -3,12 +3,14 @@
 import sys
 import json
 from ..component import Component
+import time
 
 
 class ConsoleInput(Component):
     """Input from the console, following a text prompt."""
 
     def __call__(self, *args, **kwargs):
+        time.sleep(.05)
         return input('USER INPUT> ').strip().lower()
 
 
@@ -19,11 +21,14 @@ class FileInput(Component):
         super(FileInput, self).__init__(config)
         self.input_fd = sys.stdin
         # input is not from standard input
-        if self.config and 'input_file' in self.config and 'input_file' not in ['', '-']:
+        if self.config and 'input_file' in self.config and self.config['input_file'] not in ['', '-']:
             self.input_fd = open(self.config['input_file'], 'r', encoding='UTF-8')
 
     def __call__(self, *args, **kwargs):
-        return self.input_fd.readline().strip().lower()
+        line = self.input_fd.readline()
+        if line == '':  # EOF hit
+            return None
+        return line.strip().lower()
 
     def __del__(self):
         self.input_fd.close()
@@ -48,4 +53,4 @@ class SimpleJSONInput(Component):
             x = next(self.gen)
             return x['usr']
         except (StopIteration, KeyError):
-            return ''
+            return None

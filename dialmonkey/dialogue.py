@@ -11,6 +11,7 @@ class Dialogue:
         self.user = ''
         self.system = ''
         self.nlu = DA()
+        self.action = DA()
         self.eod = False
         super(Dialogue, self).__setattr__('state', {})
         super(Dialogue, self).__setattr__('history', [])
@@ -25,11 +26,13 @@ class Dialogue:
             'user': self.user,
             'system': self.system,
             'nlu': self.nlu,
-            'state': deepcopy(self.state)
+            'state': deepcopy(self.state),
+            'action': self.action,
         })
         self.user = ''
         self.system = ''
         self.nlu = DA()
+        self.action = DA()
 
     def set_system_response(self, response):
         self.system = response
@@ -45,7 +48,7 @@ class Dialogue:
             assert isinstance(value, str), f'Attribute "{key}" has to be of type "string"'
         elif key == 'eod':
             assert isinstance(value, bool), 'Attribute "eod" has to be of type "bool"'
-        elif key == 'nlu':
+        elif key in ['nlu', 'action']:
             assert isinstance(value, DA), 'Attribute "nlu" has to be a dialmonkey.DA instance.'
         else:
             assert key not in ['history', 'state'],\
