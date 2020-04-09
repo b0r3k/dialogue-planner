@@ -63,11 +63,3 @@ class Dialogue:
             return getattr(self, item)
         else:
             return None
-
-    @staticmethod
-    def essential_attributes():
-        """
-        Essential attributes that has to be present in the valid Dialogue instance.
-        :return: list of essential attributes
-        """
-        return ['user', 'system', 'nlu', 'state', 'history', 'eod']

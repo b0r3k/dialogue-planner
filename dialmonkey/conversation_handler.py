@@ -96,7 +96,6 @@ class ConversationHandler(object):
             # run the dialogue pipeline (all components from the config)
             for component in self.components:
                 dial = component(dial, self.logger)
-                ConversationHandler._assert_is_valid_dial(dial)
             if dial['system'] is None or len(dial['system']) == 0:
                 # TODO: should be assert here?
                 logging.error('System response not filled by the pipeline!')
@@ -147,9 +146,3 @@ class ConversationHandler(object):
             self.logger.addHandler(file_handler)
         for handler in self.logger.handlers:
             handler.setLevel(getattr(logging, self.logging_level))
-
-    @staticmethod
-    def _assert_is_valid_dial(dial):
-        assert isinstance(dial, Dialogue), 'Returned Dialogue object is not valid'
-        for attr in Dialogue.essential_attributes():
-            assert hasattr(dial, attr), 'Returned dialogue does not have the attribute {}'.format(attr)
