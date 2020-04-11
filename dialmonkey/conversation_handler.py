@@ -4,12 +4,10 @@ import logging
 import json
 import time
 
-import tqdm
 
 from .dialogue import Dialogue
 from .utils import dynload_class
 from .component import Component
-from .input.text import FileInput
 from .da import DA
 
 
@@ -38,11 +36,6 @@ class ConversationHandler(object):
         except Exception as e:
             self.logger.error('Could not load class "%s"', self.config['user_stream_type'])
             raise e
-
-        if isinstance(self.user_stream, FileInput):
-            self.progressbar = tqdm.tqdm(total=len(self.user_stream))
-        else:
-            self.progressbar = None
 
         # setup output stream
         if 'output_stream_type' not in self.config:
@@ -77,8 +70,6 @@ class ConversationHandler(object):
             self.iterations += 1
         with open(self.history_fn, 'wt') as of:
             json.dump(self.history, of, indent=4, ensure_ascii=False, cls=JSONEnc)
-        if self.progressbar is not None:
-            self.progressbar.close()
 
     def run_dialogue(self, dial: Dialogue):
         """
@@ -98,8 +89,6 @@ class ConversationHandler(object):
         while not eod:
             # get a user utterance from the input stream
             user_utterance = self.user_stream(last_system)
-            if self.progressbar is not None:
-                self.progressbar.update(1)
             if user_utterance is None:
                 logging.info('Input file ended.')
                 break
@@ -108,7 +97,6 @@ class ConversationHandler(object):
             # run the dialogue pipeline (all components from the config)
             for component in self.components:
                 dial = component(dial, self.logger)
-                ConversationHandler._assert_is_valid_dial(dial)
             if dial['system'] is None or len(dial['system']) == 0:
                 # TODO: should be assert here?
                 logging.error('System response not filled by the pipeline!')
@@ -159,9 +147,3 @@ class ConversationHandler(object):
             self.logger.addHandler(file_handler)
         for handler in self.logger.handlers:
             handler.setLevel(getattr(logging, self.logging_level))
-
-    @staticmethod
-    def _assert_is_valid_dial(dial):
-        assert isinstance(dial, Dialogue), 'Returned Dialogue object is not valid'
-        for attr in Dialogue.essential_attributes():
-            assert hasattr(dial, attr), 'Returned dialogue does not have the attribute {}'.format(attr)
