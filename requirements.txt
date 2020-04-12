@@ -4,3 +4,4 @@ sklearn
 unidecode
 regex
 scipy
+requests
