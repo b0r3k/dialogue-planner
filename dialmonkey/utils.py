@@ -6,6 +6,7 @@ import random
 from typing import TypeVar, List, Callable
 
 import yaml
+from logzero import LogFormatter
 T = TypeVar('T')
 
 
@@ -107,3 +108,15 @@ class dotdict(dict):
         self[key] = value
 
     __delattr__ = dict.__delitem__
+
+
+class DialMonkeyFormatter(LogFormatter):
+    def __init__(self, path_prefix, *args, **kwargs):
+        self.path_prefix = path_prefix
+        super(DialMonkeyFormatter, self).__init__(*args, **kwargs)
+
+    def format(self, record):
+        record.relpath = record.pathname.replace(self.path_prefix, '')
+        formatted = super(DialMonkeyFormatter, self).format(record)
+        return formatted
+
