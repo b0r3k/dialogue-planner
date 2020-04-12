@@ -2,8 +2,10 @@
 
 import argparse
 import os
+import logzero
+import logging
 
-from dialmonkey.utils import load_conf, run_for_n_iterations, setup_logging
+from dialmonkey.utils import load_conf, run_for_n_iterations, DialMonkeyFormatter
 from dialmonkey.conversation_handler import ConversationHandler
 
 
@@ -19,7 +21,15 @@ def main(args):
         conf['logging_level'] = args.logging_level
     elif 'logging_level' not in conf:
         conf['logging_level'] = 'NOTSET'
-    logger = setup_logging(conf['logging_level'])
+
+    formatter = DialMonkeyFormatter(
+        path_prefix=os.path.join(os.path.abspath(os.path.curdir), 'dialmonkey/'),
+        # https://docs.python.org/3/library/logging.html#logrecord-attributes
+        fmt='%(color)s[%(levelname)1.1s %(relpath)s:%(lineno)s]%(end_color)s %(message)s',
+        datefmt='%H:%M:%S')
+
+    logger = logzero.setup_logger(level=getattr(logging, conf['logging_level']),
+                                  formatter=formatter)
 
     # setup input & output streams
     if args.user_stream_type:
