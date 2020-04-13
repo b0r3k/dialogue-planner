@@ -1,5 +1,5 @@
-from copy import deepcopy
 from .da import DA
+from .utils import dotdict
 
 
 class Dialogue:
@@ -13,7 +13,7 @@ class Dialogue:
         self.nlu = DA()
         self.action = DA()
         self.eod = False
-        super(Dialogue, self).__setattr__('state', {})
+        super(Dialogue, self).__setattr__('state', dotdict({}))
         super(Dialogue, self).__setattr__('history', [])
 
     def end_turn(self):
@@ -26,7 +26,7 @@ class Dialogue:
             'user': self.user,
             'system': self.system,
             'nlu': self.nlu,
-            'state': deepcopy(self.state),
+            'state': dotdict(self.state),
             'action': self.action,
         })
         self.user = ''
