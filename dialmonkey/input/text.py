@@ -18,6 +18,8 @@ class ConsoleInput(Component):
 
 
 class FileInput(Component, ABC):
+    """Abstract class for all file input readers."""
+
     def __init__(self, *args, **kwargs):
         super(FileInput, self).__init__()
         total_len = len(self) if len(self) > 0 else float('inf')

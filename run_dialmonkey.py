@@ -25,7 +25,7 @@ def main(args):
     formatter = DialMonkeyFormatter(
         path_prefix=os.path.join(os.path.abspath(os.path.curdir), 'dialmonkey/'),
         # https://docs.python.org/3/library/logging.html#logrecord-attributes
-        fmt='%(color)s[%(levelname)1.1s %(relpath)s:%(lineno)s]%(end_color)s %(message)s',
+        fmt='%(color)s%(asctime)s [%(levelname)1.1s %(relpath)s:%(lineno)s]%(end_color)s %(message)s',
         datefmt='%H:%M:%S')
 
     logger = logzero.setup_logger(level=getattr(logging, conf['logging_level']),
