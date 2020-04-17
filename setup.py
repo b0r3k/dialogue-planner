@@ -16,7 +16,9 @@ setup(
                       'cloudpickle',
                       'sklearn',
                       'unidecode',
-                      'regex'],
+                      'regex',
+                      'tqdm',
+                      'logzero'],
     packages=find_packages()
 )
 

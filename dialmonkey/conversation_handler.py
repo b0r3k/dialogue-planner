@@ -18,10 +18,8 @@ class ConversationHandler(object):
     def __init__(self, config, logger, should_continue=None):
         self.config = config
         self.logger = logger
-        self.logging_level = 'DEBUG' if 'logging_level' not in self.config else self.config['logging_level']
         self.history_fn = 'history-{}.json'.format(int(time.time())) \
             if 'history_fn' not in self.config else self.config['history_fn']
-        self._setup_logging()
         if should_continue is not None:
             self.should_continue = should_continue
         else:
@@ -96,7 +94,6 @@ class ConversationHandler(object):
             # run the dialogue pipeline (all components from the config)
             for component in self.components:
                 dial = component(dial, self.logger)
-                ConversationHandler._assert_is_valid_dial(dial)
             if dial['system'] is None or len(dial['system']) == 0:
                 # TODO: should be assert here?
                 logging.error('System response not filled by the pipeline!')
@@ -135,21 +132,3 @@ class ConversationHandler(object):
                 assert isinstance(component, Component),\
                     'Provided component has to inherit from the abstract class components.Component'
                 self.components.append(component)
-
-    def _setup_logging(self):
-        """
-        Setup logger level and formatting.
-        if `logging_fn` is set, logger output is forked to the respective file.
-        :return:
-        """
-        if 'logging_fn' in self.config:
-            file_handler = logging.FileHandler(self.config['logging_fn'])
-            self.logger.addHandler(file_handler)
-        for handler in self.logger.handlers:
-            handler.setLevel(getattr(logging, self.logging_level))
-
-    @staticmethod
-    def _assert_is_valid_dial(dial):
-        assert isinstance(dial, Dialogue), 'Returned Dialogue object is not valid'
-        for attr in Dialogue.essential_attributes():
-            assert hasattr(dial, attr), 'Returned dialogue does not have the attribute {}'.format(attr)

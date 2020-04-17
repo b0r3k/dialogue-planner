@@ -5,3 +5,5 @@ unidecode
 regex
 scipy
 requests
+tqdm
+logzero
