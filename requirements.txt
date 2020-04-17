@@ -3,5 +3,7 @@ cloudpickle
 sklearn
 unidecode
 regex
+scipy
+requests
 tqdm
 logzero

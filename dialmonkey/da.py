@@ -89,8 +89,8 @@ class DAI(object):
 class DA(object):
     """Dialogue act -- a list of DAIs with a few special functions for parsing etc.."""
 
-    def __init__(self):
-        self.dais = []
+    def __init__(self, dais = None):
+        self.dais = [] if dais is None else list(dais)
 
     def __getitem__(self, idx):
         return self.dais[idx]
