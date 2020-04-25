@@ -101,7 +101,7 @@ class ConversationHandler(object):
         """
         eod = False
         system_response = ""
-        self._init_components()
+        self._init_components(dial)
 
         while not eod:
             # get a user utterance from the input stream
