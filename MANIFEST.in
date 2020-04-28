@@ -1,1 +1,1 @@
-include dialmonkey/data/solar-nlg-templates.yaml
+recursive-include dialmonkey/data *
