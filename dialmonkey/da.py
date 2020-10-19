@@ -122,6 +122,8 @@ class DA(object):
     def __eq__(self, other):
         if not isinstance(other, DA):
             return NotImplemented
+        if len(self.dais) != len(other.dais):
+            return False
         for self_dai, other_dai in zip(self.dais, other.dais):
             if self_dai != other_dai:
                 return False
