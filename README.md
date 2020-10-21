@@ -8,7 +8,7 @@ Dialmonkey requires Python 3 and [pip](https://pypi.org/project/pip/).
 
 For a basic installation, clone the repository and run:
 ```
-cd dialmonkey; pip install -r requirements.txt
+cd dialmonkey; pip install [--user] -r requirements.txt
 ```
 
 If you also want to use dialmonkey as a set of libraries (e.g. import packages from it), you can
