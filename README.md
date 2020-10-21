@@ -22,6 +22,8 @@ a [virtualenv](https://virtualenv.pypa.io/en/latest/) or [conda](https://docs.co
 
 # Usage
 
+## Main: Running the Pipeline, Configuration File
+
 The platform is based on the configuration file.
 An example of such file can be found in the `conf/` directory.
 
@@ -31,10 +33,14 @@ To implement your pipeline, create new YAML file in the `conf/` directory and th
 Essential part of the configuration is the `components` list.
 You should provide one or more components that chain up to form your desired pipeline.
 
+## Your Dialogue System Components 
+
 Each component has to inherit from the abstract class
 `dialmonkey.component.Component` and be located under one of the subdirectories in the `dialmonkey/` directory  for readability
 (e.g. NLU components should go under `dialmonkey/nlu/`).
 Components also need to implement `__call__()` method which takes a dialogue object, does the work and returns the modified dialogue.
+
+## The Dialogue Object -- Dialogue History
 
 The `Dialogue` object is used as a mode of communication between components.
 The object supports dictionary-like indexing and you can add your own attributes.
@@ -54,6 +60,30 @@ Do not forget to call `Dialogue.end_dialogue()` at some point.
 
 Each run will create a JSON file with the history of all the conversations.
 You can specify this file in configuration.
+
+## Dialogue Acts -- Meaning Representation
+
+NLU outputs should be represented as dialogue acts (DAs) -- the class `dialmonkey.da.DA`
+ is used for this purpose.
+
+Each DA is basically a list of “dialogue act items” (DAIs) of the class `dialmonkey.da.DAI`,
+which represent a triple of intent - slot - value, typically written as `intent(slot=value)`,
+which is also supported by `DA`'s and `DAI`'s `str()` implementation.
+
+* If you only use global intents (one intent per utterance), you simply set the same intent 
+  for all slots in the utterance.
+* If there are no slots in your utterance, you just add one `DAI` with the intent and set the 
+  slot and the value to `None`.
+* Sometimes only the value is `None`, e.g. `request(address)` -- here the user requests the 
+  address, and we don't know the value, so the intent is `request`, the slot is `address` 
+  and the value is `None`.
+
+## Tutorial Jupyter Notebook
+
+There is a short tutorial Jupyter notebook in [`dialmonkey101.ipynb`](dialmonkey101.ipynb). It shows:
+* How to run the main pipeline (using a config file)
+* How the main pipeline and each dialogue turn looks from the inside
+* How to work with dialogue act objects
 
 For further details refer to the code.
 Have fun!
