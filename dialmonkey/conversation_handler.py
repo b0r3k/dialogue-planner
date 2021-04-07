@@ -62,7 +62,7 @@ class ConversationHandler(object):
             final_dial = self.run_dialogue(dial)
             self.history.append(final_dial['history'])
             self.iterations += 1
-        with open(self.history_fn, 'wt') as of:
+        with open(self.history_fn, 'wt', encoding='UTF-8') as of:
             json.dump(self.history, of, indent=4, ensure_ascii=False, cls=JSONEnc)
 
     def _init_components(self, dial: Dialogue):

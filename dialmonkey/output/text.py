@@ -21,8 +21,9 @@ class FileOutput:
         super(FileOutput, self).__init__()
         self.config = config
         self.output_fd = sys.stdout
+        self.encoding = config.get('output_encoding', 'UTF-8')
         if config and config.get('output_file', '') not in ['', '-']:
-            self.output_fd = open(self.config['output_file'], 'wt')
+            self.output_fd = open(self.config['output_file'], 'wt', encoding=self.encoding)
 
     def __call__(self, utterance, *args, **kwargs):
         print(utterance, file=self.output_fd)
