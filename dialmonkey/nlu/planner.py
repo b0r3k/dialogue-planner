@@ -23,6 +23,9 @@ class PlannerNLU(Component):
         # Detect inform intent - slot repeating
         get_inform_repeating(dial)        
 
+        # Detect inform intent - slot time
+        get_inform_time(dial)
+
         logger.info('NLU: %s', str(dial.nlu))
         return dial
 
@@ -138,6 +141,35 @@ def get_inform_repeating(dial):
 def get_inform_place_commute(dial):
     if re.search(r"\bz\sdomu\b", dial.user):
         dial.nlu.append(DAI(intent="inform", slot="place_start", value="home"))
-    elif re.search(pattern, string)
     if re.search(r"\bdomů\b", dial.user):
         dial.nlu.append(DAI(intent="inform", slot="place_end", value="home"))
+
+def get_inform_time(dial): 
+    # Parse time of beginning
+    if time_start := re.search(r"((?<=\bv\s)|(?<=\bod\s))\d{1,2}(?=\s?)[\s:](?=\s?)\d{2}", dial.user):
+        time_start = time_start.group()
+        if time_start[2] == ' ':
+            time_start[2] == ':'
+        dial.nlu.append(DAI(intent="inform", slot="time_start", value=time_start))
+    elif time_start := re.search(r"((?<=\bv\s)|(?<=\bod\s))\d{1,2}(?=\s(hodin\s)?ráno\b)", dial.user):
+        dial.nlu.append(DAI(intent="inform", slot="time_start", value=time_start.group()+":00"))
+    elif time_start := re.search(r"((?<=\bv\s)|(?<=\bod\s))\d{1,2}(?=\s(hodin\s)?večer\b)", dial.user):
+        if (time_start := int(time_start.group())) <= 12:
+            time_start = (time_start + 12) % 24
+        dial.nlu.append(DAI(intent="inform", slot="time_start", value=str(time_start)+":00"))
+    elif time_start := re.search(r"((?<=\bv\s)|(?<=\bod\s))\d{1,2}(?=\b)", dial.user):
+        dial.nlu.append(DAI(intent="inform", slot="time_start", value=time_start.group()+":00"))
+    # Parse time of end
+    if time_start := re.search(r"(?<=\bdo\s)\d{1,2}(?=\s?)[\s:](?=\s?)\d{2}", dial.user):
+        time_start = time_start.group()
+        if time_start[2] == ' ':
+            time_start[2] == ':'
+        dial.nlu.append(DAI(intent="inform", slot="time_end", value=time_start))
+    elif time_start := re.search(r"(?<=\bdo\s)\d{1,2}(?=\s(hodin\s)?ráno\b)", dial.user):
+        dial.nlu.append(DAI(intent="inform", slot="time_end", value=time_start.group()+":00"))
+    elif time_start := re.search(r"(?<=\bdo\s)\d{1,2}(?=\s(hodin\s)?večer\b)", dial.user):
+        if (time_start := int(time_start.group())) <= 12:
+            time_start = (time_start + 12) % 24
+        dial.nlu.append(DAI(intent="inform", slot="time_end", value=str(time_start)+":00"))
+    elif time_start := re.search(r"(?<=\bdo\s)\d{1,2}(?=\b)", dial.user):
+        dial.nlu.append(DAI(intent="inform", slot="time_end", value=time_start.group()+":00"))
