@@ -23,8 +23,17 @@ class PlannerNLU(Component):
         # Detect inform intent - slot repeating
         get_inform_repeating(dial)        
 
+        # Detect inform intent - slots place_start and place_end
+        get_inform_place_commute(dial)
+
         # Detect inform intent - slot time
         get_inform_time(dial)
+
+        # Detect inform intent - slot duration
+        get_inform_duration(dial)
+
+        # Detect inform intent - slot name
+        get_inform_name(dial)
 
         logger.info('NLU: %s', str(dial.nlu))
         return dial
@@ -79,8 +88,7 @@ def get_inform_date(dial):
         day = int(day_date.group())
     # Days from numbers when number month follows
     if not day:
-        if day_date := re.search(r"\b\d{1,2}((?=.\s*\d\b)|(?=.\s*\d{2}\b)|(?=.?\s+\d\b)|(?=.?\s+\d{2}\b))", dial.user):
-            print("z čísla")
+        if day_date := re.search(r"\b\d{1,2}((?=\.\s*\d\b)|(?=\.\s*\d{2}\b)|(?=\.?\s+\d\b)|(?=\.?\s+\d{2}\b))", dial.user):
             day = int(day_date.group())
     # Months from numbers
     if month_date := re.search(r"((?<=\d\.\s)|(?<=\d\.)|(?<=\d\s))\d{1,2}(?=\b)", dial.user):
@@ -144,18 +152,25 @@ def get_inform_place_commute(dial):
 
 def get_inform_time(dial): 
     # Parse time of beginning
-    if time_start := re.search(r"((?<=\bv\s)|(?<=\bod\s))\d{1,2}(?=\s?)[\s:](?=\s?)\d{2}", dial.user):
+    if re.search(r"\bkdykoliv?\b", dial.user):
+        dial.nlu.append(DAI(intent="inform", slot="time_start", value="anytime"))
+        dial.nlu.append(DAI(intent="inform", slot="time_end", value="anytime"))
+    if time_start := re.search(r"((?<=\bv\s)|(?<=\bve\s)|(?<=\bod\s))\d{1,2}(?=\s?)[\s:](?=\s?)\d{2}", dial.user):
         time_start = time_start.group()
         if time_start[2] == ' ':
             time_start[2] == ':'
         dial.nlu.append(DAI(intent="inform", slot="time_start", value=time_start))
-    elif time_start := re.search(r"((?<=\bv\s)|(?<=\bod\s))\d{1,2}(?=\s(hodin\s)?ráno\b)", dial.user):
+    elif time_start := re.search(r"((?<=\bv\s)|(?<=\bve\s)|(?<=\bod\s))\d{1,2}(?=\s(hodin\s)?ráno\b)", dial.user):
         dial.nlu.append(DAI(intent="inform", slot="time_start", value=time_start.group()+":00"))
-    elif time_start := re.search(r"((?<=\bv\s)|(?<=\bod\s))\d{1,2}(?=\s(hodin\s)?večer\b)", dial.user):
+    elif time_start := re.search(r"((?<=\bv\s)|(?<=\bve\s)|(?<=\bod\s))\d{1,2}(?=\s(hodin\s)?večer\b)", dial.user):
         if (time_start := int(time_start.group())) <= 12:
             time_start = (time_start + 12) % 24
         dial.nlu.append(DAI(intent="inform", slot="time_start", value=str(time_start)+":00"))
-    elif time_start := re.search(r"((?<=\bv\s)|(?<=\bod\s))\d{1,2}(?=\b)", dial.user):
+    elif time_start := re.search(r"((?<=\bv\s)|(?<=\bve\s)|(?<=\bod\s))\d{1,2}(?=\s(hodin\s)?odpoledne\b)", dial.user):
+        if (time_start := int(time_start.group())) <= 12:
+            time_start = (time_start + 12) % 24
+        dial.nlu.append(DAI(intent="inform", slot="time_start", value=str(time_start)+":00"))
+    elif time_start := re.search(r"((?<=\bv\s)|(?<=\bve\s)|(?<=\bod\s))\d{1,2}(?=\b)", dial.user):
         dial.nlu.append(DAI(intent="inform", slot="time_start", value=time_start.group()+":00"))
     # Parse time of end
     if time_start := re.search(r"(?<=\bdo\s)\d{1,2}(?=\s?)[\s:](?=\s?)\d{2}", dial.user):
@@ -168,6 +183,39 @@ def get_inform_time(dial):
     elif time_start := re.search(r"(?<=\bdo\s)\d{1,2}(?=\s(hodin\s)?večer\b)", dial.user):
         if (time_start := int(time_start.group())) <= 12:
             time_start = (time_start + 12) % 24
+    elif time_start := re.search(r"(?<=\bdo\s)\d{1,2}(?=\s(hodin\s)?odpoledne\b)", dial.user):
+        if (time_start := int(time_start.group())) <= 12:
+            time_start = (time_start + 12) % 24
         dial.nlu.append(DAI(intent="inform", slot="time_end", value=str(time_start)+":00"))
     elif time_start := re.search(r"(?<=\bdo\s)\d{1,2}(?=\b)", dial.user):
         dial.nlu.append(DAI(intent="inform", slot="time_end", value=time_start.group()+":00"))
+
+def get_inform_duration(dial):
+    minutes, hours = "00", 0
+    # Parse minutes
+    if re.search(r"\ba\spůl\b", dial.user):
+        minutes = "30"
+    elif re.search(r"\ba\spůl\b", dial.user):
+        minutes = "15"
+    elif re.search(r"\ba\stři\s?čtvrtě\b", dial.user):
+        minutes = "45"
+    # Parse hours
+    if re.search(r"\bhodinu\b", dial.user):
+        hours = 1
+    elif hours := re.search(r"(?<!v\s)(?<!ve\s)\d(?=\shodiny?\b)", dial.user):
+        hours = int(hours.group())
+    # Create the DAI
+    if minutes != "00" or hours:
+        dial.nlu.append(DAI(intent="inform", slot="duration", value=str(hours)+':'+minutes))
+
+def get_inform_name(dial):
+    if name := re.search(r"(?<=\bpřid[aáe][jtm]\s)[ěščřžýáíéóúůďťňa-z\s]+(?=[?:!,.\d])", dial.user) or (name := re.search(r"((?<=naplánovat\s)|(?<=naplánuj\s))[ěščřžýáíéóúůďťňa-z\s]+(?=[,.\d])", dial.user)):
+        name = name.group()
+        name = name.replace("zítra",' ').replace("dlouhodobě",' ').replace("pozítří",' ').strip()
+        if name:
+            dial.nlu.append(DAI(intent="inform", slot="name", value=name))
+    elif name := re.search(r"(?<=\bv\splánu\spříští\s)[ěščřžýáíéóúůďťňa-z\s]+(?=[?!:,.\d])", dial.user) or (name := re.search(r"(?<=\bv\splánu\s)[ěščřžýáíéóúůďťňa-z\s]+(?=[?!:,.\d])", dial.user)):
+        name = name.group()
+        name = name.replace("zítra",' ').replace("dlouhodobě",' ').replace("pozítří",' ').strip()
+        if name:
+            dial.nlu.append(DAI(intent="inform", slot="name", value=name))
