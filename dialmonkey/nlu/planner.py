@@ -75,17 +75,15 @@ def get_inform_date(dial):
     # Parsing of date in numbers / names of day or months
     day, month, year = 0, 0, 0
     # Days from numbers when text month follows
-    day_date = re.search(r"\b\d{1,2}(?=.?\s*(led|únor|břez|květ|červ|srp|zář[ií]|říj|listopad|prosin))\w*\b", dial.user)
-    if day_date:
+    if day_date := re.search(r"\b\d{1,2}(?=.?\s*(led|únor|břez|květ|červ|srp|zář[ií]|říj|listopad|prosin))\w*\b", dial.user):
         day = int(day_date.group())
     # Days from numbers when number month follows
     if not day:
-        day_date = re.search(r"\b\d{1,2}((?=.?\s*\d\b)|(?=.?\s*\d{2}\b))", dial.user)
-        if day_date:
+        if day_date := re.search(r"\b\d{1,2}((?=.\s*\d\b)|(?=.\s*\d{2}\b)|(?=.?\s+\d\b)|(?=.?\s+\d{2}\b))", dial.user):
+            print("z čísla")
             day = int(day_date.group())
     # Months from numbers
-    month_date = re.search(r"((?<=\d\.\s)|(?<=\d\.)|(?<=\d\s))\d{1,2}(?=\b)", dial.user)
-    if month_date:
+    if month_date := re.search(r"((?<=\d\.\s)|(?<=\d\.)|(?<=\d\s))\d{1,2}(?=\b)", dial.user):
         month = int(month_date.group())
     # Months from text
     if re.search(r"\bled(en|na|nu)\b", dial.user):
