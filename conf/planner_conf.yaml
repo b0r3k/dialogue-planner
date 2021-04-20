@@ -1,0 +1,10 @@
+# A config that uses the Planner NLU, tracker, and dummy policy
+---
+logging_level: "DEBUG"  # not strictly required
+user_stream: "dialmonkey.input.text.ConsoleInput"  # not strictly required
+output_stream: "dialmonkey.output.text.ConsoleOutput"  # not strictly required
+components:
+  - "dialmonkey.nlu.planner.PlannerNLU":  # any component can have parameters (a dict)
+  - "dialmonkey.policy.dummy.ReplyWithNLU"
+break_words:
+  - "konec"
