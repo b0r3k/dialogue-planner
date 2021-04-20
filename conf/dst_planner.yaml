@@ -1,8 +1,8 @@
-# A config that uses the Planner NLU, tracker, and dummy policy
+# A config that uses the Planner NLU, tracker, and dummy policy, replying with the dialog state
 ---
-logging_level: "DEBUG"  # not strictly required
-user_stream: "dialmonkey.input.text.ConsoleInput"  # not strictly required
-output_stream: "dialmonkey.output.text.ConsoleOutput"  # not strictly required
+logging_level: "DEBUG"
+user_stream: "dialmonkey.input.text.ConsoleInput" 
+output_stream: "dialmonkey.output.text.ConsoleOutput"
 components:
   - "dialmonkey.nlu.planner.PlannerNLU"
   - "dialmonkey.dst.rule.BeliefStateDST"
