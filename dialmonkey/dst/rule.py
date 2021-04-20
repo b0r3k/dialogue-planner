@@ -13,8 +13,7 @@ class BeliefStateDST(Component):
                 # If current thing in dial.nlu is DialogActItem
                 if isinstance(dai, DAI):
                     intent, slot = dai.intent, dai.slot
-                    if not (intent, slot) in dial.state:
-                        dial.state[(intent, slot)] = dict()
+                    dial.state[(intent, slot)] = dict()
                     dial.state[(intent, slot)][dai.value] = 1.0
 
                 # Else it is a dictionary with probabilities
