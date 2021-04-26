@@ -4,3 +4,4 @@ dialmonkey.egg-info
 .vscode/*
 venv/*
 history*
+*token.json
