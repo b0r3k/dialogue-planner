@@ -15,6 +15,8 @@ class BeliefStateDST(Component):
                     intent, slot = dai.intent, dai.slot
                     dial.state[(intent, slot)] = dict()
                     dial.state[(intent, slot)][dai.value] = 1.0
+                    if intent == "task" and slot == "goal":
+                        dial.state["goal_"] = dai.value
 
                 # Else it is a dictionary with probabilities
                 else:
