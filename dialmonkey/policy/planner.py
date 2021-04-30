@@ -1,5 +1,6 @@
 from ..component import Component
 from dialmonkey.da import DA, DAI
+from datetime import datetime, timedelta
 
 
 class PlannerPolicy(Component):
@@ -10,6 +11,29 @@ class PlannerPolicy(Component):
         self.asked_confirmation = False
         self.confirmed = False
         self.last_goal = None
+
+        # Build the API service
+        # If modifying these scopes, delete the file token.json.
+        SCOPES = ['https://www.googleapis.com/auth/calendar']
+        creds = None
+        # The file token.json stores the user's access and refresh tokens, and is
+        # created automatically when the authorization flow completes for the first
+        # time.
+        if os.path.exists('hw7/token.json'):
+            creds = Credentials.from_authorized_user_file('hw7/token.json', SCOPES)
+        # If there are no (valid) credentials available, let the user log in.
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                flow = InstalledAppFlow.from_client_secrets_file(
+                    'hw7/credentials.json', SCOPES)
+                creds = flow.run_local_server(port=0)
+            # Save the credentials for the next run
+            with open('hw7/token.json', 'w') as token:
+                token.write(creds.to_json())
+
+        self.service = build('calendar', 'v3', credentials=creds)
 
 
     def __call__(self, dial, logger):
@@ -37,19 +61,52 @@ class PlannerPolicy(Component):
 
         if goal_known:
             # Try to accomplish the goal, always check if all the slots are filled, ask confirmation when needed
+            
             if goal == "ask_day":
                 if not (missing_slots := check_slots(dial, ["date"])):
-                    # Call the API and get the events for given day
-                    pass
+                    # Call the API and get the events (up to 10) for given day
+                    date = datetime.strptime(dial.state["date"], "%Y-%m-%d")
+                    # The API needs the datetime in isoformat with timezones
+                    time_min = date.astimezone().isoformat('T')
+                    time_max = (date + timedelta(days=1)).astimezone().isoformat('T')
+                    # Query the events for given day
+                    events_result = service.events().list(calendarId='primary', timeMin=time_min, timeMax=time_max,
+                                        maxResults=10, singleEvents=True,
+                                        orderBy='startTime').execute()
+                    events = events_result.get('items', [])
+                    # Append information about each event into system action
+                    for event in events:
+                        dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
+                        dial.action.append(DAI(intent="inform", slot="event_start", value=str(event["start"]["datetime"].time())))
+                        dial.action.append(DAI(intent="inform", slot="event_end", value=str(event["end"]["datetime"].time())))
+                    # If there's no event for given day, inform about it
+                    if not events:
+                        dial.action.append(DAI(intent="inform", slot="no_events", value=None))
+
                 else:
+                    # Ask about the missing slots
                     for missing_slot in missing_slots:
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))  
 
             elif goal == "ask_event":
                 if not (missing_slots := check_slots(dial, ["name"])):
-                    # Call the API and get the event with given name
-                    pass
+                    # Call the API and get the events (up to 10) with given name
+                    name = dial.state["name"]
+                    events_result = service.events().list(calendarId='primary', timeMin=now,
+                                        maxResults=10, singleEvents=True, q=name,
+                                        orderBy='startTime').execute()
+                    events = events_result.get('items', [])
+                    # Append information about each event into system action
+                    for event in events:
+                        dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
+                        dial.action.append(DAI(intent="inform", slot="event_start", value=str(event["start"]["datetime"])))
+                        dial.action.append(DAI(intent="inform", slot="event_end", value=str(event["end"]["datetime"])))
+                    # If there's no event with such name, inform about it
+                    if not events:
+                        dial.action.append(DAI(intent="inform", slot="no_events", value=None))
+
                 else:
+                    # Ask about the missing slots
                     for missing_slot in missing_slots:
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))
                 
@@ -64,6 +121,7 @@ class PlannerPolicy(Component):
                         self.asked_confirmation, self.confirmed = False, False
                         dial.action.append(DAI(intent="inform", slot="succ_add", value=None))                        
                 else:
+                    # Ask about the missing slots
                     for missing_slot in missing_slots:
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))
                 
@@ -78,6 +136,7 @@ class PlannerPolicy(Component):
                         self.asked_confirmation, self.confirmed = False, False
                         dial.action.append(DAI(intent="inform", slot="succ_change", value=None))
                 else:
+                    # Ask about the missing slots
                     for missing_slot in missing_slots:
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))
                 
@@ -92,6 +151,7 @@ class PlannerPolicy(Component):
                         self.asked_confirmation, self.confirmed = False, False
                         dial.action.append(DAI(intent="inform", slot="succ_del", value=None))
                 else:
+                    # Ask about the missing slots
                     for missing_slot in missing_slots:
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))
                 
