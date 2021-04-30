@@ -1,6 +1,11 @@
 from ..component import Component
 from dialmonkey.da import DA, DAI
 from datetime import datetime, timedelta
+import os.path
+from googleapiclient.discovery import build
+from google_auth_oauthlib.flow import InstalledAppFlow
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
 
 
 class PlannerPolicy(Component):
@@ -101,8 +106,12 @@ class PlannerPolicy(Component):
                         dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
                         dial.action.append(DAI(intent="inform", slot="event_start", value=str(event["start"]["datetime"])))
                         dial.action.append(DAI(intent="inform", slot="event_end", value=str(event["end"]["datetime"])))
-                    # If there's no event with such name, inform about it
-                    if not events:
+                    
+                    if events:
+                        # If there is any, save the event id for further use
+                        dial.state["id"] = events[0]["id"]
+                    else:
+                        # If there's no event with such name, inform about it
                         dial.action.append(DAI(intent="inform", slot="no_events", value=None))
 
                 else:
@@ -124,7 +133,7 @@ class PlannerPolicy(Component):
                             event = create_event(dial.state["name"], dial.state["date"], dial.state["time_start"], dial.state["time_end"], dial.state["place"], None)
 
                         # call the API and add the event, infrom the user that successfull
-                        event_add = service.events().insert(calendarId='primary', body=event).execute()
+                        event_add = self.service.events().insert(calendarId='primary', body=event).execute()
                         if event_add:
                             dial.action.append(DAI(intent="inform", slot="succ_add", value=None))                        
                         else:
@@ -144,9 +153,34 @@ class PlannerPolicy(Component):
                         dial.action.append(DAI(intent="ask", slot="confirm_change", value=None))
                         self.asked_confirmation = True
                     else:
-                        # When confirmed, TODO call the API and change the event, infrom the user that successfull
+                        # When confirmed, retrieve the event
+                        event = self.service.events().get(calendarId='primary', eventId=dial.state["id"]).execute()
+                        # Change the values where desired
+                        if "name" in dial.state:
+                            event["summary"] = dial.state["name"]
+                        if "place" in dial.state:
+                            event["location"] = dial.state["place"]
+                        if "date" in dial.state:
+                            if "time_start" in dial.state:
+                                start = dial.state["date"] + '-' + dial.state["time_start"]
+                            else:
+                                start = dial.state["date"] + '-' + str(event["start"]["datetime"].time())
+                            event["start"]["datetime"] = datetime.strptime(start, "%Y-%m-%d-%H:%M").astimezone().isoformat('T')
+                        elif "time_start" in dial.state:
+                            duration = event["end"]["datetime"] - event["start"]["datetime"]
+                            start = str(event["start"]["datetime"].date()) + '-' + dial.state["time_start"]                            
+                            event["start"]["datetime"] = datetime.strptime(start, "%Y-%m-%d-%H:%M").astimezone().isoformat('T')
+                            event["end"]["datetime"] = event["start"]["datetime"] + duration
+
+                        # Call the API and insert the updated event, infrom the user that successfull
+                        updated_event = self.service.events().update(calendarId='primary', eventId=event['id'], body=event).execute()
+                        if updated_event:
+                            dial.action.append(DAI(intent="inform", slot="succ_change", value=None))
+                        else:
+                            dial.action.append(DAI(intent="error", slot="unsucc_change", value=None))
+                        
                         self.asked_confirmation, self.confirmed = False, False
-                        dial.action.append(DAI(intent="inform", slot="succ_change", value=None))
+
                 else:
                     # Ask about the missing slots
                     for missing_slot in missing_slots:
