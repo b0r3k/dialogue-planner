@@ -70,7 +70,7 @@ class PlannerPolicy(Component):
                     time_min = date.astimezone().isoformat('T')
                     time_max = (date + timedelta(days=1)).astimezone().isoformat('T')
                     # Query the events for given day
-                    events_result = service.events().list(calendarId='primary', timeMin=time_min, timeMax=time_max,
+                    events_result = self.service.events().list(calendarId='primary', timeMin=time_min, timeMax=time_max,
                                         maxResults=10, singleEvents=True,
                                         orderBy='startTime').execute()
                     events = events_result.get('items', [])
@@ -92,7 +92,7 @@ class PlannerPolicy(Component):
                 if not (missing_slots := check_slots(dial, ["name"])):
                     # Call the API and get the events (up to 10) with given name
                     name = dial.state["name"]
-                    events_result = service.events().list(calendarId='primary', timeMin=now,
+                    events_result = self.service.events().list(calendarId='primary', timeMin=now,
                                         maxResults=10, singleEvents=True, q=name,
                                         orderBy='startTime').execute()
                     events = events_result.get('items', [])
@@ -111,15 +111,27 @@ class PlannerPolicy(Component):
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))
                 
             elif goal == "add_event":
-                if not (missing_slots := check_slots(dial, ["name", "date", "time_start", "time_end", "place", "repeating"])):
+                if not (missing_slots := check_slots(dial, ["name", "date", "time_start", "time_end", "place"])):
                     if not self.confirmed:
                         # Let user confirm
                         dial.action.append(DAI(intent="ask", slot="confirm_add", value=None))
                         self.asked_confirmation = True
                     else:
-                        # When confirmed, TODO call the API and add the event, infrom the user that successfull
-                        self.asked_confirmation, self.confirmed = False, False
-                        dial.action.append(DAI(intent="inform", slot="succ_add", value=None))                        
+                        # When confirmed, create the event
+                        if "repeating" in dial.state:
+                            event = create_event(dial.state["name"], dial.state["date"], dial.state["time_start"], dial.state["time_end"], dial.state["place"], dial.state["repeating"])
+                        else:
+                            event = create_event(dial.state["name"], dial.state["date"], dial.state["time_start"], dial.state["time_end"], dial.state["place"], None)
+
+                        # call the API and add the event, infrom the user that successfull
+                        event_add = service.events().insert(calendarId='primary', body=event).execute()
+                        if event_add:
+                            dial.action.append(DAI(intent="inform", slot="succ_add", value=None))                        
+                        else:
+                            dial.action.append(DAI(intent="error", slot="unsucc_add", value=None))
+                        
+                        self.asked_confirmation, self.confirmed = False, False                       
+
                 else:
                     # Ask about the missing slots
                     for missing_slot in missing_slots:
@@ -202,3 +214,29 @@ def check_slots(dial, slots):
             missing_slots.append(slot)
     
     return missing_slots
+
+def create_event(name, date, time_start, time_end, place, repeating):
+    start = date + '-' + time_start
+    start = datetime.strptime(start, "%Y-%m-%d-%H:%M").astimezone().isoformat('T')
+    end = date + '-' + time_end
+    end = datetime.strptime(end, "%Y-%m-%d-%H:%M").astimezone().isoformat('T')
+    event = {
+                'summary': name,
+                'location': place,
+                'start': {
+                    'dateTime': start
+                },
+                'end': {
+                    'dateTime': end
+                }
+            }
+    if repeating == "day":
+        event['reccurence'] = ['RRULE:FREQ=DAILY']
+    elif repeating == "week":
+        event['reccurence'] = ['RRULE:FREQ=WEEKLY']
+    elif repeating == "month":
+        event['reccurence'] = ['RRULE:FREQ=MONTHLY']
+    elif repeating == "year":
+        event['reccurence'] = ['RRULE:FREQ=YEARLY']
+
+    return event
