@@ -82,10 +82,16 @@ class PlannerPolicy(Component):
                     # Append information about each event into system action
                     for event in events:
                         dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
-                        dial.action.append(DAI(intent="inform", slot="event_start", value=str(event["start"]["datetime"].time())))
-                        dial.action.append(DAI(intent="inform", slot="event_end", value=str(event["end"]["datetime"].time())))
-                    # If there's no event for given day, inform about it
+                        start = datetime.fromisoformat(event["start"]["dateTime"])
+                        dial.action.append(DAI(intent="inform", slot="event_start", value=start.strftime("%H:%M")))
+                        end = datetime.fromisoformat(event["end"]["dateTime"])
+                        dial.action.append(DAI(intent="inform", slot="event_end", value=end.strftime("%H:%M")))
+
+                    if len(events) == 1:
+                        # If there is only one, save the event id for further use
+                        dial.state["id"] = events[0]["id"]
                     if not events:
+                        # If there's no event for given day, inform about it
                         dial.action.append(DAI(intent="inform", slot="no_events", value=None))
 
                 else:
@@ -98,15 +104,17 @@ class PlannerPolicy(Component):
                 if not (missing_slots := check_slots(dial, ["name"])):
                     # Call the API and get the events (up to 10) with given name
                     name = dial.state["name"]
-                    events_result = self.service.events().list(calendarId='primary', timeMin=now,
+                    events_result = self.service.events().list(calendarId='primary', timeMin=datetime.now().astimezone().isoformat('T'),
                                         maxResults=10, singleEvents=True, q=name,
                                         orderBy='startTime').execute()
                     events = events_result.get('items', [])
                     # Append information about each event into system action
                     for event in events:
                         dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
-                        dial.action.append(DAI(intent="inform", slot="event_start", value=str(event["start"]["datetime"])))
-                        dial.action.append(DAI(intent="inform", slot="event_end", value=str(event["end"]["datetime"])))
+                        start = datetime.fromisoformat(event["start"]["dateTime"])
+                        dial.action.append(DAI(intent="inform", slot="event_start", value=start.strftime("%H:%M")))
+                        end = datetime.fromisoformat(event["end"]["dateTime"])
+                        dial.action.append(DAI(intent="inform", slot="event_end", value=end.strftime("%H:%M")))
                     
                     if events:
                         # If there is any, save the event id for further use
@@ -122,7 +130,7 @@ class PlannerPolicy(Component):
 
 
             elif goal == "add_event":
-                if not (missing_slots := check_slots(dial, ["name", "date", "time_start", "time_end", "place"])):
+                if not (missing_slots := check_slots(dial, ["name", "date", "time_start", "time_end"])):
                     if not self.confirmed:
                         # Let user confirm
                         dial.action.append(DAI(intent="ask", slot="confirm_add", value=None))
@@ -132,7 +140,7 @@ class PlannerPolicy(Component):
                         if "repeating" in dial.state:
                             event = create_event(dial.state["name"], dial.state["date"], dial.state["time_start"], dial.state["time_end"], dial.state["place"], dial.state["repeating"])
                         else:
-                            event = create_event(dial.state["name"], dial.state["date"], dial.state["time_start"], dial.state["time_end"], dial.state["place"], None)
+                            event = create_event(dial.state["name"], dial.state["date"], dial.state["time_start"], dial.state["time_end"], "Praha", None)
 
                         # call the API and add the event, infrom the user that successfull
                         event_add = self.service.events().insert(calendarId='primary', body=event).execute()
@@ -164,16 +172,32 @@ class PlannerPolicy(Component):
                         if "place" in dial.state:
                             event["location"] = dial.state["place"]
                         if "date" in dial.state:
+                            orig_start = datetime.fromisoformat(event["start"]["dateTime"])
+                            orig_end = datetime.fromisoformat(event["end"]["dateTime"])
+                            duration = orig_end - orig_start
                             if "time_start" in dial.state:
                                 start = dial.state["date"] + '-' + dial.state["time_start"]
                             else:
-                                start = dial.state["date"] + '-' + str(event["start"]["datetime"].time())
-                            event["start"]["datetime"] = datetime.strptime(start, "%Y-%m-%d-%H:%M").astimezone().isoformat('T')
+                                start = dial.state["date"] + '-' + datetime.fromisoformat(event["start"]["dateTime"]).strftime("%H:%M")
+                            start = datetime.strptime(start, "%Y-%m-%d-%H:%M")
+                            event["start"]["dateTime"] = start.astimezone().isoformat('T')
+                            if "time_end" in dial.state:
+                                end = str(orig_end.date()) + '-' + dial.state["time_end"]
+                                event["end"]["dateTime"] = datetime.strptime(end, "%Y-%m-%d-%H:%M").astimezone().isoformat('T')
+                            else:
+                                event["end"]["dateTime"] = (start + duration).astimezone().isoformat('T')
                         elif "time_start" in dial.state:
-                            duration = event["end"]["datetime"] - event["start"]["datetime"]
-                            start = str(event["start"]["datetime"].date()) + '-' + dial.state["time_start"]                            
-                            event["start"]["datetime"] = datetime.strptime(start, "%Y-%m-%d-%H:%M").astimezone().isoformat('T')
-                            event["end"]["datetime"] = event["start"]["datetime"] + duration
+                            orig_start = datetime.fromisoformat(event["start"]["dateTime"])
+                            orig_end = datetime.fromisoformat(event["end"]["dateTime"])
+                            duration = orig_end - orig_start
+                            start = datetime.strptime((str(orig_start.date()) + '-' + dial.state["time_start"]), "%Y-%m-%d-%H:%M")                            
+                            event["start"]["dateTime"] = start.astimezone().isoformat('T')
+                            if "time_end" in dial.state:
+                                end = str(orig_end.date()) + '-' + dial.state["time_end"]
+                                event["end"]["dateTime"] = datetime.strptime(end, "%Y-%m-%d-%H:%M").astimezone().isoformat('T')
+                            else:
+                                event["end"]["dateTime"] = (start + duration).astimezone().isoformat('T')
+                            event["end"]["dateTime"] = (start + duration).astimezone().isoformat('T')
 
                         # Call the API and insert the updated event, infrom the user that successfull
                         updated_event = self.service.events().update(calendarId='primary', eventId=event['id'], body=event).execute()
@@ -234,7 +258,7 @@ def get_confirmation(dial):
 
     confirmed = False
     for da in dial.nlu:
-        if da.intent == "confirm" and dial.slot == "value" and dial.value:
+        if da.intent == "confirm" and da.slot == "value" and da.value:
             confirmed = True
     return confirmed
 
