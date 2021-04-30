@@ -198,19 +198,13 @@ def get_confirmation(dial):
 
 
 def check_slots(dial, slots):
-    # Check if the values for asked slots are known with some reasonable probability (0.7)
+    # Check if the values for asked slots are known
     # If not, return missing slots
 
     missing_slots = []
 
     for slot in slots:
-        found = False
-        if ("inform", slot) in dial.state:
-            probabilities = dial.state[("inform", slot)]
-            for value in probabilities:
-                if probabilities[value] > 0.7:
-                    found = True
-        if not found:
+        if not slot in dial.state:
             missing_slots.append(slot)
     
     return missing_slots
