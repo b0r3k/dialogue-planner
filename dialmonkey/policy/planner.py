@@ -93,6 +93,7 @@ class PlannerPolicy(Component):
                     for missing_slot in missing_slots:
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))  
 
+
             elif goal == "ask_event":
                 if not (missing_slots := check_slots(dial, ["name"])):
                     # Call the API and get the events (up to 10) with given name
@@ -118,7 +119,8 @@ class PlannerPolicy(Component):
                     # Ask about the missing slots
                     for missing_slot in missing_slots:
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))
-                
+
+
             elif goal == "add_event":
                 if not (missing_slots := check_slots(dial, ["name", "date", "time_start", "time_end", "place"])):
                     if not self.confirmed:
@@ -145,7 +147,8 @@ class PlannerPolicy(Component):
                     # Ask about the missing slots
                     for missing_slot in missing_slots:
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))
-                
+
+
             elif goal == "change_event":
                 if not (missing_slots := check_slots(dial, ["id"])):
                     if not self.confirmed:
@@ -185,25 +188,30 @@ class PlannerPolicy(Component):
                     # Ask about the missing slots
                     for missing_slot in missing_slots:
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))
-                
+
+
             elif goal == "delete_event":
                 if not (missing_slots := check_slots(dial, ["id"])):
-                    # Let user confirm
                     if not self.confirmed:
+                        # Let user confirm
                         dial.action.append(DAI(intent="ask", slot="confirm_del", value=None))
                         self.asked_confirmation = True
                     else:
-                        # When confirmed, TODO call the API and delete the event, infrom the user that successfull
+                        # When confirmed, call the API and delete the event, infrom the user that successfull
+                        self.service.events().delete(calendarId='primary', eventId=dial.state["id"]).execute()
                         self.asked_confirmation, self.confirmed = False, False
                         dial.action.append(DAI(intent="inform", slot="succ_del", value=None))
+
                 else:
                     # Ask about the missing slots
                     for missing_slot in missing_slots:
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))
                 
+
             else:
                 # Goal in dial.state, but handling unknown
                 dial.action.append(DAI(intent="error", slot="goal_unimplemented", value=None))   
+
 
         else:
              # Goal unknown, ask it
