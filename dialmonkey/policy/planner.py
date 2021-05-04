@@ -6,6 +6,8 @@ from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from dialmonkey.dialogue import Dialogue
+from dialmonkey.utils import dotdict
 
 
 class PlannerPolicy(Component):
@@ -68,7 +70,8 @@ class PlannerPolicy(Component):
             # Try to accomplish the goal, always check if all the slots are filled, ask confirmation when needed
             
             if goal == "ask_day":
-                if not (missing_slots := check_slots(dial, ["date"])):
+                slots_needed = ["date"]
+                if not (missing_slots := check_slots(dial, slots_needed)):
                     # Call the API and get the events (up to 10) for given day
                     date = datetime.strptime(dial.state["date"], "%Y-%m-%d")
                     # The API needs the datetime in isoformat with timezones
@@ -87,6 +90,9 @@ class PlannerPolicy(Component):
                         end = datetime.fromisoformat(event["end"]["dateTime"])
                         dial.action.append(DAI(intent="inform", slot="event_end", value=end.strftime("%H:%M")))
 
+                    # Reset the state
+                    super(Dialogue, dial).__setattr__('state', dotdict({}))
+
                     if len(events) == 1:
                         # If there is only one, save the event id for further use
                         dial.state["id"] = events[0]["id"]
@@ -101,7 +107,8 @@ class PlannerPolicy(Component):
 
 
             elif goal == "ask_event":
-                if not (missing_slots := check_slots(dial, ["name"])):
+                slots_needed = ["name"]
+                if not (missing_slots := check_slots(dial, slots_needed)):
                     # Call the API and get the events (up to 10) with given name
                     name = dial.state["name"]
                     events_result = self.service.events().list(calendarId='primary', timeMin=datetime.now().astimezone().isoformat('T'),
@@ -116,6 +123,9 @@ class PlannerPolicy(Component):
                         end = datetime.fromisoformat(event["end"]["dateTime"])
                         dial.action.append(DAI(intent="inform", slot="event_end", value=end.strftime("%H:%M")))
                     
+                    # Reset the state
+                    super(Dialogue, dial).__setattr__('state', dotdict({}))
+
                     if events:
                         # If there is any, save the event id for further use
                         dial.state["id"] = events[0]["id"]
@@ -130,10 +140,12 @@ class PlannerPolicy(Component):
 
 
             elif goal == "add_event":
-                if not (missing_slots := check_slots(dial, ["name", "date", "time_start", "time_end"])):
+                slots_needed = ["name", "date", "time_start", "time_end"]
+                if not (missing_slots := check_slots(dial, slots_needed)):
                     if not self.confirmed:
-                        # Let user confirm
+                        # Let user confirm action and all slots
                         dial.action.append(DAI(intent="ask", slot="confirm_add", value=None))
+                        ask_confirmation_slots(dial, slots_needed)
                         self.asked_confirmation = True
                     else:
                         # When confirmed, create the event
@@ -149,7 +161,10 @@ class PlannerPolicy(Component):
                         else:
                             dial.action.append(DAI(intent="error", slot="unsucc_add", value=None))
                         
-                        self.asked_confirmation, self.confirmed = False, False                       
+                        # Reset everything, keep the id of the added event
+                        self.asked_confirmation, self.confirmed = False, False     
+                        super(Dialogue, dial).__setattr__('state', dotdict({}))
+                        dial.state["id"] = event_add["id"]
 
                 else:
                     # Ask about the missing slots
@@ -158,10 +173,12 @@ class PlannerPolicy(Component):
 
 
             elif goal == "change_event":
-                if not (missing_slots := check_slots(dial, ["id"])):
+                slots_needed = ["id"]
+                if not (missing_slots := check_slots(dial, slots_needed)):
                     if not self.confirmed:
-                        # Let user confirm
+                        # Let user confirm action and all slots
                         dial.action.append(DAI(intent="ask", slot="confirm_change", value=None))
+                        ask_confirmation_slots(dial, slots_needed)
                         self.asked_confirmation = True
                     else:
                         # When confirmed, retrieve the event
@@ -206,7 +223,11 @@ class PlannerPolicy(Component):
                         else:
                             dial.action.append(DAI(intent="error", slot="unsucc_change", value=None))
                         
+                        # Reset everything except the id
                         self.asked_confirmation, self.confirmed = False, False
+                        id = dial.state["id"]
+                        super(Dialogue, dial).__setattr__('state', dotdict({}))
+                        dial.state["id"] = id
 
                 else:
                     # Ask about the missing slots
@@ -215,16 +236,21 @@ class PlannerPolicy(Component):
 
 
             elif goal == "delete_event":
-                if not (missing_slots := check_slots(dial, ["id"])):
+                slots_needed = ["id"]
+                if not (missing_slots := check_slots(dial, slots_needed)):
                     if not self.confirmed:
-                        # Let user confirm
+                        # Let user confirm action and all slots
                         dial.action.append(DAI(intent="ask", slot="confirm_del", value=None))
+                        ask_confirmation_slots(dial, slots_needed)
                         self.asked_confirmation = True
                     else:
                         # When confirmed, call the API and delete the event, infrom the user that successfull
                         self.service.events().delete(calendarId='primary', eventId=dial.state["id"]).execute()
-                        self.asked_confirmation, self.confirmed = False, False
                         dial.action.append(DAI(intent="inform", slot="succ_del", value=None))
+
+                        # Reset everything
+                        self.asked_confirmation, self.confirmed = False, False
+                        super(Dialogue, dial).__setattr__('state', dotdict({}))
 
                 else:
                     # Ask about the missing slots
@@ -262,7 +288,6 @@ def get_confirmation(dial):
             confirmed = True
     return confirmed
 
-
 def check_slots(dial, slots):
     # Check if the values for asked slots are known
     # If not, return missing slots
@@ -274,6 +299,20 @@ def check_slots(dial, slots):
             missing_slots.append(slot)
     
     return missing_slots
+
+def ask_confirmation_slots(dial, slots):
+    # Confirm the values of the slots
+    for slot in slots:
+        if slot != "id":
+            dial.action.append(DAI(intent="ask", slot=("confirm_" + slot), value=dial.state[slot]))  
+        else:
+            event = self.service.events().get(calendarId='primary', id=dial.state["id"]).execute()
+            values = [(name, summary), (date, start)]
+            start = datetime.fromisoformat(event["start"]["dateTime"])
+            dial.action.append(DAI(intent="inform", slot="confirm_old_time_start", value=start.strftime("%H:%M")))
+            end = datetime.fromisoformat(event["end"]["dateTime"])
+            dial.action.append(DAI(intent="inform", slot="confirm_old_time_end", value=end.strftime("%H:%M")))
+            dial.action.append(DAI(intent="inform", slot="confirm_old_date", value=str(start.date())))
 
 def create_event(name, date, time_start, time_end, place, repeating):
     start = date + '-' + time_start
