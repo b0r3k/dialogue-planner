@@ -145,7 +145,7 @@ class PlannerPolicy(Component):
                     if not self.confirmed:
                         # Let user confirm action and all slots
                         dial.action.append(DAI(intent="ask", slot="confirm_add", value=None))
-                        ask_confirmation_slots(dial, slots_needed)
+                        ask_confirmation_slots(dial, self, slots_needed)
                         self.asked_confirmation = True
                     else:
                         # When confirmed, create the event
@@ -178,7 +178,7 @@ class PlannerPolicy(Component):
                     if not self.confirmed:
                         # Let user confirm action and all slots
                         dial.action.append(DAI(intent="ask", slot="confirm_change", value=None))
-                        ask_confirmation_slots(dial, slots_needed)
+                        ask_confirmation_slots(dial, self, slots_needed)
                         self.asked_confirmation = True
                     else:
                         # When confirmed, retrieve the event
@@ -241,7 +241,7 @@ class PlannerPolicy(Component):
                     if not self.confirmed:
                         # Let user confirm action and all slots
                         dial.action.append(DAI(intent="ask", slot="confirm_del", value=None))
-                        ask_confirmation_slots(dial, slots_needed)
+                        ask_confirmation_slots(dial, self, slots_needed)
                         self.asked_confirmation = True
                     else:
                         # When confirmed, call the API and delete the event, infrom the user that successfull
@@ -300,14 +300,13 @@ def check_slots(dial, slots):
     
     return missing_slots
 
-def ask_confirmation_slots(dial, slots):
+def ask_confirmation_slots(dial, policy_object, slots):
     # Confirm the values of the slots
     for slot in slots:
         if slot != "id":
             dial.action.append(DAI(intent="ask", slot=("confirm_" + slot), value=dial.state[slot]))  
         else:
-            event = self.service.events().get(calendarId='primary', id=dial.state["id"]).execute()
-            values = [(name, summary), (date, start)]
+            event = policy_object.service.events().get(calendarId='primary', eventId=dial.state["id"]).execute()
             start = datetime.fromisoformat(event["start"]["dateTime"])
             dial.action.append(DAI(intent="inform", slot="confirm_old_time_start", value=start.strftime("%H:%M")))
             end = datetime.fromisoformat(event["end"]["dateTime"])
