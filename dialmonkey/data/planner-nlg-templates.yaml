@@ -1,0 +1,2 @@
+--- 
+inform(event_name={name}, event_start={start}, event_end={end}): Máte v plánu {name} od {start} do {end}.
