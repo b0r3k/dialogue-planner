@@ -1,0 +1,75 @@
+{
+    "inform":
+    {
+        "event_name,event_date,event_start,event_end": [
+            "Máte v plánu {event_name} dne {event_date} od {event_start} do {event_end}."
+        ],
+        "no_events": [
+            "Pro toto zadání jsem v plánech nic nenašla."
+        ],
+        "succ_add": [
+            "Úspěšně přidáno! Co si přejete dál?"
+        ],
+        "succ_change": [
+            "Úspěšně změněno! Co si přejete dál?"
+        ],
+        "succ_del": [
+            "Úspěšně smazáno! Co si přejete dál?"
+        ]
+
+    },
+    "error":
+    {
+        "unsucc_add": [
+            "Tohle se mi bohužel nepovedlo přidat a nevím, co bylo špatně."
+        ],
+        "unsucc_change": [
+            "Tohle se mi bohužel nepovedlo změnit a nevím, co bylo špatně."
+        ],
+        "goal_unimplemented": [
+            "Vím, co po mně chcete, ale tohle mě bohužel ještě nenaučili."
+        ]
+    },
+    "ask":
+    {
+        "date": [
+            "Jaký den?"
+        ],
+        "name": [
+            "Jaký by měla mít událost název?"
+        ],
+        "time_start": [
+            "Od kdy?"
+        ],
+        "time_end": [
+            "Do kdy?"
+        ],
+        "time_start,time_end": [
+            "Od kdy do kdy?"
+        ],
+        "id": [
+            "První budu potřebovat vědět, o jaké události v kalendáři se bavíme."
+        ],
+        "confirm_add,confirm_name,confirm_date,confirm_time_start,confirm_time_end": [
+            "Chcete přidat {confirm_name} dne {confirm_date} od {confirm_time_start} do {confirm_time_end}?"
+        ],
+        "confirm_change,confirm_old_name,confirm_old_time_start=,confirm_old_time_end,confirm_old_date": [
+            "Mám změnit událost, která se původně jmenovala {confirm_old_name} a konala se {confirm_old_date} od {confirm_old_time_start} do {confirm_old_time_end}?"
+        ],
+        "confirm_new_name": [
+            "Nově se bude jmenovat {confirm_new_name}."
+        ],
+        "confirm_new_date": [
+            "Bude dne {confirm_new_date}."
+        ],
+        "confirm_new_time_start": [
+            "Bude od {confirm_new_time_start}."
+        ],
+        "confirm_del,confirm_old_name,confirm_old_time_start,confirm_old_time_end,confirm_old_date": [
+            "Mám smazat událost {confirm_old_name}, která se konala {confirm_old_date} od {confirm_old_time_start} do {confirm_old_time_end}?"
+        ],
+        "goal": [
+            "Co si přejete udělat? Moc toho neumím, jen manipulovat s událostmi v kalendáři a ještě občas moc nerozumím."
+        ]
+    }
+}
