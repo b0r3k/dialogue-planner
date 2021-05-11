@@ -290,7 +290,7 @@ def get_confirmation(dial):
 
     confirmed = False
     for da in dial.nlu:
-        if da.intent == "confirm" and da.slot == "value" and da.value:
+        if da.intent == "confirm" and da.slot == "value" and da.value == "true":
             confirmed = True
     return confirmed
 
@@ -313,12 +313,12 @@ def ask_confirmation_slots(dial, policy_object, slots):
             dial.action.append(DAI(intent="ask", slot=("confirm_" + slot), value=dial.state[slot]))  
         else:
             event = policy_object.service.events().get(calendarId='primary', eventId=dial.state["id"]).execute()
-            dial.action.append(DAI(intent="inform", slot="confirm_old_name", value=event["summary"]))
+            dial.action.append(DAI(intent="ask", slot="confirm_old_name", value=event["summary"]))
             start = datetime.fromisoformat(event["start"]["dateTime"])
-            dial.action.append(DAI(intent="inform", slot="confirm_old_time_start", value=start.strftime("%H:%M")))
+            dial.action.append(DAI(intent="ask", slot="confirm_old_time_start", value=start.strftime("%H:%M")))
             end = datetime.fromisoformat(event["end"]["dateTime"])
-            dial.action.append(DAI(intent="inform", slot="confirm_old_time_end", value=end.strftime("%H:%M")))
-            dial.action.append(DAI(intent="inform", slot="confirm_old_date", value=str(start.date())))
+            dial.action.append(DAI(intent="ask", slot="confirm_old_time_end", value=end.strftime("%H:%M")))
+            dial.action.append(DAI(intent="ask", slot="confirm_old_date", value=str(start.date())))
 
 def create_event(name, date, time_start, time_end, place, repeating):
     start = date + '-' + time_start
