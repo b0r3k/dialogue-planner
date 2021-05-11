@@ -1,2 +1,22 @@
 --- 
 inform(event_name={name}, event_start={start}, event_end={end}): Máte v plánu {name} od {start} do {end}.
+inform(no_events): Pro toto zadání jsem v plánech nic nenašla.
+inform(succ_add): Úspěšně přidáno! Co si přejete dál?
+error(unsucc_add): Tohle se mi bohužel nepovedlo přidat a nevím, co bylo špatně.
+inform(succ_change): Úspěšně změněno! Co si přejete dál?
+error(unsucc_change): Tohle se mi bohužel nepovedlo změnit a nevím, co bylo špatně.
+inform(succ_del): Úspěšně smazáno! Co si přejete dál?
+ask(date): Jaký den?
+ask(name): Jaký by měla mít událost název?
+ask(time_start): Od kdy?
+ask(time_end): Do kdy?
+ask(time_start, time_end): Od kdy do kdy?
+ask(id): První budu potřebovat vědět, o jaké události v kalendáři se bavíme.
+ask(confirm_add, confirm_name={name}, confirm_date={date}, confirm_time_start={start}, confirm_time_end={end}): Chcete přidat {name} dne {date} od {start} do {end}?
+ask(confirm_change, confirm_old_name={old_name}, confirm_old_time_start={old_start}, confirm_old_time_end={old_end}, confirm_old_date={old_date}): Mám změnit událost, která se původně jmenovala {old_name} a konala se {old_date} od {old_start} do {old_end}?
+ask(confirm_new_name={name}): Nově se bude jmenovat {name}.
+ask(confirm_new_date={date}): Bude dne {date}.
+ask(confirm_new_time_start={start}): Bude od {start}.
+ask(confirm_del, confirm_old_name={old_name}, confirm_old_time_start={old_start}, confirm_old_time_end={old_end}, confirm_old_date={old_date}): Mám smazat událost, která se původně jmenovala {old_name} a konala se {old_date} od {old_start} do {old_end}?
+error(goal_unimplemented): Vím, co po mně chcete, ale tohle mě bohužel ještě nenaučili.
+ask(goal): Co si přejete udělat? Moc toho neumím, jen manipulovat s událostmi v kalendáři a ještě občas moc nerozumím.
