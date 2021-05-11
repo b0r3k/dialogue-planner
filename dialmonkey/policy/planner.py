@@ -179,6 +179,10 @@ class PlannerPolicy(Component):
                         # Let user confirm action and all slots
                         dial.action.append(DAI(intent="ask", slot="confirm_change", value=None))
                         ask_confirmation_slots(dial, self, slots_needed)
+                        slots_possible = ["name", "date", "time_start"]
+                        for slot in slots_possible:
+                            if slot in dial.state:
+                                dial.action.append(DAI(intent="ask", slot="confirm_new_" + slot, value=dial.state[slot]))
                         self.asked_confirmation = True
                     else:
                         # When confirmed, retrieve the event
@@ -307,6 +311,7 @@ def ask_confirmation_slots(dial, policy_object, slots):
             dial.action.append(DAI(intent="ask", slot=("confirm_" + slot), value=dial.state[slot]))  
         else:
             event = policy_object.service.events().get(calendarId='primary', eventId=dial.state["id"]).execute()
+            dial.action.append(DAI(intent="inform", slot="confirm_old_name", value=event["summary"]))
             start = datetime.fromisoformat(event["start"]["dateTime"])
             dial.action.append(DAI(intent="inform", slot="confirm_old_time_start", value=start.strftime("%H:%M")))
             end = datetime.fromisoformat(event["end"]["dateTime"])
