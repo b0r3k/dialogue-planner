@@ -118,6 +118,8 @@ class PlannerPolicy(Component):
                     # Append information about each event into system action
                     for event in events:
                         dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
+                        date = datetime.fromisoformat(event["start"]["dateTime"]).date()
+                        dial.action.append(DAI(intent="inform", slot="event_date", value=str(date)))                        
                         start = datetime.fromisoformat(event["start"]["dateTime"])
                         dial.action.append(DAI(intent="inform", slot="event_start", value=start.strftime("%H:%M")))
                         end = datetime.fromisoformat(event["end"]["dateTime"])
