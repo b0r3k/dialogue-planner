@@ -84,6 +84,7 @@ class PlannerPolicy(Component):
                     events = events_result.get('items', [])
                     # Append information about each event into system action
                     for event in events:
+                        dial.action.append(DAI(intent="inform", slot="event_by_date", value=None))
                         dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
                         start = datetime.fromisoformat(event["start"]["dateTime"])
                         dial.action.append(DAI(intent="inform", slot="event_start", value=start.strftime("%H:%M")))
@@ -117,6 +118,7 @@ class PlannerPolicy(Component):
                     events = events_result.get('items', [])
                     # Append information about each event into system action
                     for event in events:
+                        dial.action.append(DAI(intent="inform", slot="event_by_name", value=None))
                         dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
                         date = datetime.fromisoformat(event["start"]["dateTime"]).date()
                         dial.action.append(DAI(intent="inform", slot="event_date", value=str(date)))                        
@@ -273,6 +275,7 @@ class PlannerPolicy(Component):
              # Goal unknown, ask it
              dial.action.append(DAI(intent="ask", slot="goal", value=None))
 
+        logger.info('Policy: %s', str(dial.action))
         return dial
 
 def get_goal(dial):
