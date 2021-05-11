@@ -1,8 +1,11 @@
 {
     "inform":
     {
-        "event_name,event_date,event_start,event_end": [
-            "Máte v plánu {event_name} dne {event_date} od {event_start} do {event_end}."
+        "event_by_date,event_name,event_start,event_end": [
+            "{event_name} od {event_start} do {event_end}"
+        ],
+        "event_by_name,event_name,event_date,event_start,event_end": [
+            "{event_name} dne {event_date} od {event_start} do {event_end}"
         ],
         "no_events": [
             "Pro toto zadání jsem v plánech nic nenašla."
