@@ -56,17 +56,32 @@
         "confirm_add,confirm_name,confirm_date,confirm_time_start,confirm_time_end": [
             "Chcete přidat {confirm_name} dne {confirm_date} od {confirm_time_start} do {confirm_time_end}?"
         ],
-        "confirm_change,confirm_old_name,confirm_old_time_start=,confirm_old_time_end,confirm_old_date": [
+        "confirm_change,confirm_old_name,confirm_old_time_start,confirm_old_time_end,confirm_old_date": [
             "Mám změnit událost, která se původně jmenovala {confirm_old_name} a konala se {confirm_old_date} od {confirm_old_time_start} do {confirm_old_time_end}?"
+        ],
+        "confirm_change": [
+            "Chcete změnit událost?"
+        ],
+        "confirm_old_name": [
+            "Původně se jmenovala {confirm_old_name}."
+        ],
+        "confirm_old_date": [
+            "Měla datum {confirm_old_date}."
+        ],
+        "confirm_old_time_start,confirm_old_time_end": [
+            "Měla být od {confirm_old_time_start} do {confirm_old_time_end}."
+        ],
+        "confirm_old_name,confirm_old_time_start,confirm_old_time_end,confirm_old_date": [
+            "Původně se jmenovala {confirm_old_name} a konala se {confirm_old_date} od {confirm_old_time_start} do {confirm_old_time_end}."
         ],
         "confirm_new_name": [
             "Nově se bude jmenovat {confirm_new_name}."
         ],
         "confirm_new_date": [
-            "Bude dne {confirm_new_date}."
+            "Nově bude dne {confirm_new_date}."
         ],
         "confirm_new_time_start": [
-            "Bude od {confirm_new_time_start}."
+            "Nově bude od {confirm_new_time_start}."
         ],
         "confirm_del,confirm_old_name,confirm_old_time_start,confirm_old_time_end,confirm_old_date": [
             "Mám smazat událost {confirm_old_name}, která se konala {confirm_old_date} od {confirm_old_time_start} do {confirm_old_time_end}?"
