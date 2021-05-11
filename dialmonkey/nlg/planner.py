@@ -14,6 +14,7 @@ class PlannerNLG(Component):
             self.templates = json.load(f)
 
     def __call__(self, dial, logger):
+        # Get list of responses (individual sentences), join them and set
         responses = self.get_responses(dial)
         response = ' '.join(responses)
         dial.set_system_response(response)
@@ -31,6 +32,7 @@ class PlannerNLG(Component):
         # Get different slots of same intent into a dict[intents] called to_process
         for dai in action_iterator:
             intent = dai.intent
+            # Processing information about events
             if intent == "inform" and (dai.slot == "event_by_name" or dai.slot == "event_by_date"):
                 replacements = dict()
                 values_needed = 4 if dai.slot == "event_by_name" else 3
@@ -40,19 +42,19 @@ class PlannerNLG(Component):
                     replacements[next_dai.slot] = next_dai.value
                 response = choice(self.templates["inform"][','.join(replacements.keys())])
                 event_infos.append(response.format(**replacements))
-
+            # Not information about event, intent different from last -> save
             elif intent != last_intent and current:
                 if intent in to_process:
                     to_process[intent] += current
                 else:
                     to_process[intent] = current
                 current = [dai]
-
+            # Intent same as last, add to list
             else:
                 current.append(dai)
 
             last_intent = intent
-
+        # Save anything left to the dictionary
         if current:
             if (intent := current[0].intent) in to_process:
                 to_process[intent] += current
@@ -67,8 +69,6 @@ class PlannerNLG(Component):
             beginnings = ["Máte v plánu ", "Máte naplánováno ", "V kalendáři jsem našla "]
             response = choice(beginnings) + response + '.'
             responses.append(response)
-
-        print(to_process)
 
         # Go through the unprocessed dais
         for intent, dais in to_process.items():
