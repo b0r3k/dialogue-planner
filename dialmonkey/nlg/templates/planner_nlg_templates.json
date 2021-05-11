@@ -5,10 +5,12 @@
             "{event_name} od {event_start} do {event_end}"
         ],
         "event_by_name,event_name,event_date,event_start,event_end": [
-            "{event_name} dne {event_date} od {event_start} do {event_end}"
+            "{event_name} dne {event_date} od {event_start} do {event_end}",
+            "dne {event_date} od {event_start} do {event_end} máte v plánu {event_name}"
         ],
         "no_events": [
-            "Pro toto zadání jsem v plánech nic nenašla."
+            "Pro toto zadání jsem v plánech nic nenašla.",
+            "Žádnou takovou událost jsem v kalendáři nenašla."
         ],
         "succ_add": [
             "Úspěšně přidáno! Co si přejete dál?"
@@ -36,22 +38,29 @@
     "ask":
     {
         "date": [
-            "Jaký den?"
+            "Jaký den?",
+            "Na jaké datum?"
         ],
         "name": [
-            "Jaký by měla mít událost název?"
+            "Jaký by měla mít událost název?",
+            "Jak ji chcete pojmenovat?"
         ],
         "time_start": [
-            "Od kdy?"
+            "Od kdy?",
+            "Od kolika hodin?"
         ],
         "time_end": [
-            "Do kdy?"
+            "Do kdy?",
+            "Do kolika hodin?"
         ],
         "time_start,time_end": [
-            "Od kdy do kdy?"
+            "Od kdy do kdy?",
+            "Kdy má začínat a kdy končit?",
+            "Od kolika do kolika?"
         ],
         "id": [
-            "První budu potřebovat vědět, o jaké události v kalendáři se bavíme."
+            "První budu potřebovat vědět, o jaké události v kalendáři se bavíme.",
+            "Jakou událost máte na mysli?"
         ],
         "confirm_add,confirm_name,confirm_date,confirm_time_start,confirm_time_end": [
             "Chcete přidat {confirm_name} dne {confirm_date} od {confirm_time_start} do {confirm_time_end}?"
