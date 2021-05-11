@@ -30,7 +30,8 @@ class PlannerNLG(Component):
         # Transform informing about events straight to responses
         # Get different slots of same intent into a dict[intents] called to_process
         for dai in action_iterator:
-            if dai.intent == "inform" and (dai.slot == "event_by_name" or dai.slot == "event_by_date"):
+            intent = dai.intent
+            if intent == "inform" and (dai.slot == "event_by_name" or dai.slot == "event_by_date"):
                 replacements = dict()
                 values_needed = 4 if dai.slot == "event_by_name" else 3
                 replacements[dai.slot] = None
@@ -39,9 +40,8 @@ class PlannerNLG(Component):
                     replacements[next_dai.slot] = next_dai.value
                 response = choice(self.templates["inform"][','.join(replacements.keys())])
                 event_infos.append(response.format(**replacements))
-                last_intent = "inform"
 
-            elif (intent := dai.intent) != last_intent and current:
+            elif intent != last_intent and current:
                 if intent in to_process:
                     to_process[intent] += current
                 else:
@@ -51,6 +51,15 @@ class PlannerNLG(Component):
             else:
                 current.append(dai)
 
+            last_intent = intent
+
+        if current:
+            if (intent := current[0].intent) in to_process:
+                to_process[intent] += current
+            else:
+                to_process[intent] = current
+
+
         # Join all the event information sentences to something sensible and add it do responses
         if event_infos:
             joints = [", dále ", ", pak ", ", potom "]
@@ -58,6 +67,8 @@ class PlannerNLG(Component):
             beginnings = ["Máte v plánu ", "Máte naplánováno ", "V kalendáři jsem našla "]
             response = choice(beginnings) + response + '.'
             responses.append(response)
+
+        print(to_process)
 
         # Go through the unprocessed dais
         for intent, dais in to_process.items():
@@ -67,9 +78,33 @@ class PlannerNLG(Component):
             if all_slots in self.templates[intent]:
                 response = choice(self.templates[intent][all_slots])
                 responses.append(response.format(**replacements))
-            # Not found, find templates for individual slots
-            for item in dais:
-                response = choice(self.templates[intent][item.slot])
-                responses.append(response.format(**replacements))
+            # Not found, go through slots one by one, try to match consecutive pairs, if not successfull, match individuals
+            # Trying to match all subsets would be crazy ineffective
+            else:
+                processed = False
+                for i in range(1, len(dais)):
+                    prev_item = dais[i-1]
+                    item = dais[i]
+                    # If this one is not processed yet
+                    if not processed:
+                        # Try this one with the previous one in both combinations
+                        if (pair := ','.join([prev_item.slot, item.slot])) in self.templates[intent]:
+                            response = choice(self.templates[intent][pair])
+                            processed = True
+                        elif (pair := ','.join([item.slot, prev_item.slot])) in self.templates[intent]:
+                            response = choice(self.templates[intent][pair])
+                            processed = True
+                        # Not found -> process the previous one and not this one
+                        else:
+                            response = choice(self.templates[intent][prev_item.slot])
+                            processed = False
+                        responses.append(response.format(**replacements))
+                    # This one is processed, but the next one not
+                    else:
+                        processed = False
+                # Process the last one if needed
+                if not processed:
+                    response = choice(self.templates[intent][dais[-1].slot])
+                    responses.append(response.format(**replacements))
 
         return responses
