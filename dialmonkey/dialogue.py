@@ -1,5 +1,6 @@
 from .da import DA
 from .utils import dotdict
+import pickle
 
 
 class Dialogue:
@@ -25,14 +26,42 @@ class Dialogue:
         self.history.append({
             'user': self.user,
             'system': self.system,
-            'nlu': self.nlu,
-            'state': dotdict(self.state),
-            'action': self.action,
+            'nlu': self.nlu.to_cambridge_da_string() if isinstance(self.nlu, DA) else self.nlu,
+            'action': self.action.to_cambridge_da_string() if isinstance(self.action, DA) else self.action,
+            'state': {k: v for k, v in self.state.items()},
         })
         self.user = ''
         self.system = ''
         self.nlu = DA()
         self.action = DA()
+
+    def serialize(self):
+        obj_dict = {
+            'system': self.system,
+            'user': self.user,
+            'nlu': ('DA', self.nlu.to_cambridge_da_string()) if isinstance(self.nlu, DA) else ('list', self.nlu),
+            'action': ('DA', self.action.to_cambridge_da_string()) if isinstance(self.action, DA) else ('act', self.action),
+            'eod': self.eod,
+            'state': {k: v for k, v in self.state.items()},
+            'history': self.history
+        }
+        return pickle.dumps(obj_dict)
+
+    def load_from_serialized(self, serialized_str):
+        serialized_dict = pickle.loads(serialized_str)
+        self.user = serialized_dict['user']
+        self.system = serialized_dict['system']
+        if serialized_dict['nlu'][0] == 'DA':
+            self.nlu = DA.parse_cambridge_da(serialized_dict['nlu'][1])
+        else:
+            self.nlu = serialized_dict['nlu'][1]
+        if serialized_dict['action'][0] == 'DA':
+            self.action = DA.parse_cambridge_da(serialized_dict['action'][1])
+        else:
+            self.action = serialized_dict['action'][1]
+        self.eod = serialized_dict['eod']
+        super(Dialogue, self).__setattr__('state', dotdict(serialized_dict['state']))
+        super(Dialogue, self).__setattr__('history', serialized_dict['history'])
 
     def set_system_response(self, response):
         self.system = response
