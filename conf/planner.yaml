@@ -7,6 +7,6 @@ components:
   - "dialmonkey.nlu.planner.PlannerNLU"
   - "dialmonkey.dst.rule.BeliefStateDST"
   - "dialmonkey.policy.planner.PlannerPolicy"
-  - "dialmonkey.policy.dummy.ReplyWithSystemAction"
+  - "dialmonkey.nlg.planner.PlannerNLG"
 break_words:
   - "konec"

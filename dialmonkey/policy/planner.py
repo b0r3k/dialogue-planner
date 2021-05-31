@@ -84,6 +84,7 @@ class PlannerPolicy(Component):
                     events = events_result.get('items', [])
                     # Append information about each event into system action
                     for event in events:
+                        dial.action.append(DAI(intent="inform", slot="event_by_date", value=None))
                         dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
                         start = datetime.fromisoformat(event["start"]["dateTime"])
                         dial.action.append(DAI(intent="inform", slot="event_start", value=start.strftime("%H:%M")))
@@ -117,7 +118,10 @@ class PlannerPolicy(Component):
                     events = events_result.get('items', [])
                     # Append information about each event into system action
                     for event in events:
+                        dial.action.append(DAI(intent="inform", slot="event_by_name", value=None))
                         dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
+                        date = datetime.fromisoformat(event["start"]["dateTime"]).date()
+                        dial.action.append(DAI(intent="inform", slot="event_date", value=str(date)))                        
                         start = datetime.fromisoformat(event["start"]["dateTime"])
                         dial.action.append(DAI(intent="inform", slot="event_start", value=start.strftime("%H:%M")))
                         end = datetime.fromisoformat(event["end"]["dateTime"])
@@ -179,6 +183,10 @@ class PlannerPolicy(Component):
                         # Let user confirm action and all slots
                         dial.action.append(DAI(intent="ask", slot="confirm_change", value=None))
                         ask_confirmation_slots(dial, self, slots_needed)
+                        slots_possible = ["name", "date", "time_start"]
+                        for slot in slots_possible:
+                            if slot in dial.state:
+                                dial.action.append(DAI(intent="ask", slot="confirm_new_" + slot, value=dial.state[slot]))
                         self.asked_confirmation = True
                     else:
                         # When confirmed, retrieve the event
@@ -267,6 +275,7 @@ class PlannerPolicy(Component):
              # Goal unknown, ask it
              dial.action.append(DAI(intent="ask", slot="goal", value=None))
 
+        logger.info('Policy: %s', str(dial.action))
         return dial
 
 def get_goal(dial):
@@ -284,7 +293,7 @@ def get_confirmation(dial):
 
     confirmed = False
     for da in dial.nlu:
-        if da.intent == "confirm" and da.slot == "value" and da.value:
+        if da.intent == "confirm" and da.slot == "value" and da.value == "true":
             confirmed = True
     return confirmed
 
@@ -307,11 +316,12 @@ def ask_confirmation_slots(dial, policy_object, slots):
             dial.action.append(DAI(intent="ask", slot=("confirm_" + slot), value=dial.state[slot]))  
         else:
             event = policy_object.service.events().get(calendarId='primary', eventId=dial.state["id"]).execute()
+            dial.action.append(DAI(intent="ask", slot="confirm_old_name", value=event["summary"]))
             start = datetime.fromisoformat(event["start"]["dateTime"])
-            dial.action.append(DAI(intent="inform", slot="confirm_old_time_start", value=start.strftime("%H:%M")))
+            dial.action.append(DAI(intent="ask", slot="confirm_old_time_start", value=start.strftime("%H:%M")))
             end = datetime.fromisoformat(event["end"]["dateTime"])
-            dial.action.append(DAI(intent="inform", slot="confirm_old_time_end", value=end.strftime("%H:%M")))
-            dial.action.append(DAI(intent="inform", slot="confirm_old_date", value=str(start.date())))
+            dial.action.append(DAI(intent="ask", slot="confirm_old_time_end", value=end.strftime("%H:%M")))
+            dial.action.append(DAI(intent="ask", slot="confirm_old_date", value=str(start.date())))
 
 def create_event(name, date, time_start, time_end, place, repeating):
     start = date + '-' + time_start
