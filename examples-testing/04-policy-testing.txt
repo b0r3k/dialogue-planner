@@ -1,0 +1,29 @@
+co mám v plánu zítra?
+SYSTEM: inform(event_name='doktor   od',event_start='09:00',event_end='10:00',event_name=doktor,event_start='09:00',event_end='10:00',event_name='doktor   od',event_start='09:00',event_end='10:00',event_name='doktor   od',event_start='09:00',event_end='10:00',event_name='doktor   od',event_start='09:00',event_end='10:00',event_name=doktor,event_start='11:00',event_end='12:00',event_name=doktora,event_start='11:00',event_end='12:00',event_name=přednáška,event_start='15:00',event_end='16:00')
+
+naplánovat kadeřnictví u anny 13.5. od 3 odpoledne do 4 odpoledne.
+SYSTEM: ask(confirm_add,confirm_name='kadeřnictví u anny',confirm_date=2021-05-13,confirm_time_start='15:00',confirm_time_end='16:00')
+
+přidat zítra vaření oběda.
+SYSTEM: ask(time_start,time_end)
+
+přidat cvičit, každý den.
+SYSTEM: ask(date,time_start,time_end)
+
+v 7 večer, hodinu.
+SYSTEM: ask(goal)
+
+kdy mám v plánu příští návštěva lékaře?
+SYSTEM: inform(no_events)
+
+změnit na 30. května.
+SYSTEM: ask(id)
+
+naplánovat státnice, 10. září.
+SYSTEM: ask(time_start,time_end)
+
+pozítří od 11:00 do 14:00.
+SYSTEM: ask(goal)
+
+přidat odevzdat bakalářku, 22. července. 
+SYSTEM: ask(time_start,time_end)

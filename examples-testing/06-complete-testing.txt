@@ -1,0 +1,47 @@
+"user": "co mám v plánu zítra?",
+"system": "Máte v plánu doktor od 15:00 do 16:00.",
+"user": "chci přidat vaření oběda.",
+"system": "Jaký den? Od kdy do kdy?",
+"user": "zítra, od 11 do 12.",
+"system": "Chcete přidat vaření oběda dne 2021-05-12 od 11:00 do 12:00?",
+"user": "ano.",
+"system": "Úspěšně přidáno! Co si přejete dál?",
+"user": "konec.",
+
+
+
+"user": "kdy mám v plánu příští přednáška?",
+"system": "Pro toto zadání jsem v plánech nic nenašla.",
+"user": "kdy mám v plánu příští doktor?",
+"system": "Máte naplánováno doktor dne 2021-05-12 od 15:00 do 16:00.",
+"user": "změnit na 15.5.",
+"system": "Chcete změnit událost? Původně se jmenovala doktor. Měla být od 15:00 do 16:00. Měla datum 2021-05-12. Nově bude dne 2021-05-15.",
+"user": "ano.",
+"system": "Úspěšně změněno! Co si přejete dál?",
+"user": "konec",
+
+
+
+"user": "příští týden.. vlastně možná ten potom.. chci jít do kadeřnictví.",
+"system": "Co si přejete udělat? Moc toho neumím, jen manipulovat s událostmi v kalendáři a ještě občas moc nerozumím.",
+"user": "naplánovat kadeřnictví 18.5.",
+"system": "Od kdy do kdy?",
+"user": "od 15 do 16 hodin.",
+"system": "Chcete přidat kadeřnictví dne 2021-05-18 od 15:00 do 16:00?",
+"user": "ano.",
+"system": "Úspěšně přidáno! Co si přejete dál?",
+"user": "změnit na od 16 do 17.",
+"system": "Chcete změnit událost? Původně se jmenovala kadeřnictví. Měla být od 15:00 do 16:00. Měla datum 2021-05-18. Nově bude od 16:00.",
+"user": "ano.",
+"system": "Úspěšně změněno! Co si přejete dál?",
+"user": "konec.",
+
+
+
+"user": "kdy mám v plánu kadeřnictví?",
+"system": "Máte naplánováno kadeřnictví dne 2021-05-18 od 16:00 do 17:00, potom kadeřnictví dne 2021-05-18 od 16:00 do 17:00.",
+"user": "smazat.",
+"system": "Mám smazat událost kadeřnictví, která se konala 2021-05-18 od 16:00 do 17:00?",
+"user": "ano.",
+"system": "Úspěšně smazáno! Co si přejete dál?",
+"user": "konec.",

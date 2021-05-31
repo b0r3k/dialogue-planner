@@ -1,0 +1,59 @@
+Co mám v plánu zítra?
+
+SYSTEM: inform(event_name='doktor   od',event_start='09:00',event_end='10:00',event_name=doktor,event_start='09:00',event_end='10:00',event_name='doktor   od',event_start='09:00',event_end='10:00',event_name='doktor   od',event_start='09:00',event_end='10:00',event_name='doktor   od',event_start='09:00',event_end='10:00',event_name=doktor,event_start='11:00',event_end='12:00',event_name=doktora,event_start='11:00',event_end='12:00',event_name=přednáška,event_start='15:00',event_end='16:00')
+
+Ano, chci přidat vaření oběda.
+
+SYSTEM: ask(date,time_start,time_end)
+
+Zítra, od 11 do 12.
+
+SYSTEM: ask(confirm_add,confirm_name='vaření oběda',confirm_date=2021-05-05,confirm_time_start='11:00',confirm_time_end='12:00')
+
+Ano.
+
+SYSTEM: inform(succ_add)
+
+Konec.
+
+
+
+Kdy mám v plánu příští přednáška?
+
+SYSTEM: inform(event_name=přednáška,event_start='15:00',event_end='16:00')
+
+Změnit na příští úterý.
+
+SYSTEM: ask(confirm_change)&inform(confirm_old_time_start='15:00',confirm_old_time_end='16:00',confirm_old_date=2021-05-05)
+
+Ano.
+
+SYSTEM: inform(succ_change)
+
+
+
+Příští týden.. vlastně možná ten potom.. chci jít do kadeřnictví.
+
+SYSTEM: ask(goal)
+
+Naplánovat kadeřnictví 18.5.
+
+SYSTEM: ask(time_start,time_end)
+
+Od 15 do 16 hodin.
+
+SYSTEM: ask(confirm_add,confirm_name=kadeřnictví,confirm_date=2021-05-18,confirm_time_start='15:00',confirm_time_end='16:00')
+
+Změnit! Od 16 do 17.
+
+SYSTEM: ask(id)
+
+Přidat kadeřnictví 18.5. od 16 do 17.
+
+SYSTEM: ask(confirm_add,confirm_name=kadeřnictví,confirm_date=2021-05-18,confirm_time_start='16:00',confirm_time_end='17:00')
+
+Ano.
+
+SYSTEM: inform(succ_add)
+
+Konec.
