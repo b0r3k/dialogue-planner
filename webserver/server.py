@@ -82,7 +82,7 @@ def process_request():
         if sessid in dialogues:
             dial = Dialogue()
             dial.load_from_serialized(dialogues[sessid]["dial"])
-            response, _ = handler.get_response(dial, rqst["user"])
+            response, _ = handler.get_response(dial, rqst["user"].lower())
             dialogues[sessid]["dial"] = dial.serialize()
             dialogues[sessid]["last_used"] = now
 
