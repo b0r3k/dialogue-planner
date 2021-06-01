@@ -276,6 +276,8 @@ class PlannerPolicy(Component):
         else:
              # Goal unknown, ask it
              dial.action.append(DAI(intent="ask", slot="goal", value=None))
+             # Reset the state
+             super(Dialogue, dial).__setattr__('state', dotdict({}))
 
         logger.info('Policy: %s', str(dial.action))
         return dial
