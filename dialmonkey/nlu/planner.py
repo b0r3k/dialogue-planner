@@ -7,6 +7,8 @@ class PlannerNLU(Component):
     """A planner NLU that is able to parse commands for manipulating events in calendar and planning commute."""
 
     def __call__(self, dial, logger):
+        # Lower-case the input
+        dial.user = dial.user.lower()
 
         # Detect confirm intent
         get_confirm(dial)
