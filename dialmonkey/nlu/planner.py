@@ -25,6 +25,9 @@ class PlannerNLU(Component):
         # Detect inform intent - slot repeating
         get_inform_repeating(dial)        
 
+        # Detect inform intent - slot place
+        get_inform_place(dial)
+
         # Detect inform intent - slots place_start and place_end
         get_inform_place_commute(dial)
 
@@ -133,8 +136,10 @@ def get_inform_date(dial):
         dial.nlu.append(DAI(intent="inform", slot="date", value=str(value)))
 
 def get_inform_place(dial):
-    if re.search(r"\bdoma\b", dial.user):
-        dial.nlu.append(DAI(intent="inform", slot="place", value="home"))
+    if place := re.search(r"(?<=\bv\s)[ěščřžýáíéóúůďťňa-z\s]+", dial.user):
+        place = place.group()
+        if place:
+            dial.nlu.append(DAI(intent="inform", slot="place", value=place))
             
 def get_inform_repeating(dial):
     if re.search(r"(?<=\bkaždý\s)den", dial.user):
@@ -219,5 +224,9 @@ def get_inform_name(dial):
     elif name := re.search(r"(?<=\bv\splánu\spříští\s)[ěščřžýáíéóúůďťňa-z\s]+(?=[?!:,.\d])", dial.user) or (name := re.search(r"(?<=\bv\splánu\s)[ěščřžýáíéóúůďťňa-z\s]+(?=[?!:,.\d])", dial.user)):
         name = name.group()
         name = name.replace("zítra",' ').replace("dlouhodobě",' ').replace("pozítří",' ').strip()
+        if name:
+            dial.nlu.append(DAI(intent="inform", slot="name", value=name))
+    elif name := re.search(r"(?<=\bnázev\s)|(?<=\bjméno\s)[ěščřžýáíéóúůďťňa-z\s]+", dial.user):
+        name = name.group()
         if name:
             dial.nlu.append(DAI(intent="inform", slot="name", value=name))

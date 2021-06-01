@@ -35,7 +35,7 @@ class PlannerNLG(Component):
             # Processing information about events
             if intent == "inform" and (dai.slot == "event_by_name" or dai.slot == "event_by_date"):
                 replacements = dict()
-                values_needed = 4 if dai.slot == "event_by_name" else 3
+                values_needed = 5 if dai.slot == "event_by_name" else 4
                 replacements[dai.slot] = None
                 for _ in range(values_needed):
                     next_dai = next(action_iterator)

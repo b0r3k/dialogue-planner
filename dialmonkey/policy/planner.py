@@ -90,6 +90,7 @@ class PlannerPolicy(Component):
                         dial.action.append(DAI(intent="inform", slot="event_start", value=start.strftime("%H:%M")))
                         end = datetime.fromisoformat(event["end"]["dateTime"])
                         dial.action.append(DAI(intent="inform", slot="event_end", value=end.strftime("%H:%M")))
+                        dial.action.append(DAI(intent="inform", slot="place", value=event["location"]))
 
                     # Reset the state
                     super(Dialogue, dial).__setattr__('state', dotdict({}))
@@ -126,6 +127,7 @@ class PlannerPolicy(Component):
                         dial.action.append(DAI(intent="inform", slot="event_start", value=start.strftime("%H:%M")))
                         end = datetime.fromisoformat(event["end"]["dateTime"])
                         dial.action.append(DAI(intent="inform", slot="event_end", value=end.strftime("%H:%M")))
+                        dial.action.append(DAI(intent="inform", slot="place", value=event["location"]))
                     
                     # Reset the state
                     super(Dialogue, dial).__setattr__('state', dotdict({}))
@@ -144,7 +146,7 @@ class PlannerPolicy(Component):
 
 
             elif goal == "add_event":
-                slots_needed = ["name", "date", "time_start", "time_end"]
+                slots_needed = ["name", "date", "time_start", "time_end", "place"]
                 if not (missing_slots := check_slots(dial, slots_needed)):
                     if not self.confirmed:
                         # Let user confirm action and all slots
@@ -156,7 +158,7 @@ class PlannerPolicy(Component):
                         if "repeating" in dial.state:
                             event = create_event(dial.state["name"], dial.state["date"], dial.state["time_start"], dial.state["time_end"], dial.state["place"], dial.state["repeating"])
                         else:
-                            event = create_event(dial.state["name"], dial.state["date"], dial.state["time_start"], dial.state["time_end"], "Praha", None)
+                            event = create_event(dial.state["name"], dial.state["date"], dial.state["time_start"], dial.state["time_end"], dial.state["place"], None)
 
                         # call the API and add the event, infrom the user that successfull
                         event_add = self.service.events().insert(calendarId='primary', body=event).execute()
@@ -183,7 +185,7 @@ class PlannerPolicy(Component):
                         # Let user confirm action and all slots
                         dial.action.append(DAI(intent="ask", slot="confirm_change", value=None))
                         ask_confirmation_slots(dial, self, slots_needed)
-                        slots_possible = ["name", "date", "time_start"]
+                        slots_possible = ["name", "date", "time_start", "place"]
                         for slot in slots_possible:
                             if slot in dial.state:
                                 dial.action.append(DAI(intent="ask", slot="confirm_new_" + slot, value=dial.state[slot]))
@@ -322,6 +324,7 @@ def ask_confirmation_slots(dial, policy_object, slots):
             end = datetime.fromisoformat(event["end"]["dateTime"])
             dial.action.append(DAI(intent="ask", slot="confirm_old_time_end", value=end.strftime("%H:%M")))
             dial.action.append(DAI(intent="ask", slot="confirm_old_date", value=str(start.date())))
+            dial.action.append(DAI(intent="ask", slot="confirm_old_place", value=event["location"]))
 
 def create_event(name, date, time_start, time_end, place, repeating):
     start = date + '-' + time_start
