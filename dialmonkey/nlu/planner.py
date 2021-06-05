@@ -216,15 +216,17 @@ def get_inform_duration(dial):
         dial.nlu.append(DAI(intent="inform", slot="duration", value=str(hours)+':'+minutes))
 
 def get_inform_name(dial):
-    if name := re.search(r"(?<=\bpřid[aáe][jtm]\s)[ěščřžýáíéóúůďťňa-z\s]+?(?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b)", dial.user) or (name := re.search(r"((?<=naplánovat\s)|(?<=naplánuj\s))[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user)):
+    if name := re.search(r"(?<=\bpřid[aáe][jtm]\s)[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user) or (name := re.search(r"((?<=naplánovat\s)|(?<=naplánuj\s))[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user)):
         name = name.group()
-        name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').replace(" mi ", '').strip().split()
+        name = re.sub(r"\bmi\b", '', name)
+        name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').strip().split()
         name = ' '.join(name)
         if name:
             dial.nlu.append(DAI(intent="inform", slot="name", value=name))
-    elif name := re.search(r"(?<=\bv\splánu\spříští\s)[ěščřžýáíéóúůďťňa-z\s]+?(?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b)", dial.user) or (name := re.search(r"(?<=\bv\splánu\s)[ěščřžýáíéóúůďťňa-z\s]+?(?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b)", dial.user)):
+    elif name := re.search(r"(?<=\bv\splánu\spříští\s)[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user) or (name := re.search(r"(?<=\bv\splánu\s)[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user)):
         name = name.group()
-        name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').replace("mi", '').strip().split()
+        name = re.sub(r"\bmi\b", '', name)
+        name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').strip().split()
         name = ' '.join(name)
         if name:
             dial.nlu.append(DAI(intent="inform", slot="name", value=name))
