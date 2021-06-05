@@ -2,6 +2,7 @@ from ..component import Component
 from ..da import DAI
 import datetime
 import re
+from ..nlu.morphodita_integration import lemmatize_string
 
 class PlannerNLU(Component):
     """A planner NLU that is able to parse commands for manipulating events in calendar and planning commute."""
@@ -142,8 +143,9 @@ def get_inform_date(dial):
         dial.nlu.append(DAI(intent="inform", slot="date", value=str(value)))
 
 def get_inform_place(dial):
-    if place := re.search(r"(?<=\bv\s)[ěščřžýáíéóúůďťňa-z\s]+", dial.user):
+    if (place := re.search(r"(?<=\bv\s)(?!plánu\s)[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user)) or (place := re.search(r"(?<=\bv\s)(?!plánu\s)[ěščřžýáíéóúůďťňa-z\s]+", dial.user)):
         place = place.group()
+        place = lemmatize_string(place)
         if place:
             dial.nlu.append(DAI(intent="inform", slot="place", value=place))
             
@@ -222,21 +224,26 @@ def get_inform_duration(dial):
         dial.nlu.append(DAI(intent="inform", slot="duration", value=str(hours)+':'+minutes))
 
 def get_inform_name(dial):
-    if name := re.search(r"(?<=\bpřid[aáe][jtm]\s)[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user) or (name := re.search(r"((?<=naplánovat\s)|(?<=naplánuj\s))[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user)):
-        name = name.group()
-        name = re.sub(r"\bmi\b", '', name)
-        name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').strip().split()
-        name = ' '.join(name)
-        if name:
-            dial.nlu.append(DAI(intent="inform", slot="name", value=name))
-    elif name := re.search(r"(?<=\bv\splánu\spříští\s)[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user) or (name := re.search(r"(?<=\bv\splánu\s)[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user)):
-        name = name.group()
-        name = re.sub(r"\bmi\b", '', name)
-        name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').strip().split()
-        name = ' '.join(name)
-        if name:
-            dial.nlu.append(DAI(intent="inform", slot="name", value=name))
+    # if something (interpunction, digits, "od, "na") is after name, match as little as possible
+    if name := re.search(r"(?<=\bpřid[aáe][jtm]\s)[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user) \
+    or (name := re.search(r"((?<=naplánovat\s)|(?<=naplánuj\s))[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user)) \
+    or (name := re.search(r"(?<=\bv\splánu\spříští\s)[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user)) \
+    or (name := re.search(r"(?<=\bv\splánu\s)[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user)):
+        pass
+    # if nothing from previous is after name, match as much as possible
+    elif name := re.search(r"(?<=\bpřid[aáe][jtm]\s)[ěščřžýáíéóúůďťňa-z\s]+", dial.user) \
+    or (name := re.search(r"((?<=naplánovat\s)|(?<=naplánuj\s))[ěščřžýáíéóúůďťňa-z\s]+", dial.user)) \
+    or (name := re.search(r"(?<=\bv\splánu\spříští\s)[ěščřžýáíéóúůďťňa-z\s]+", dial.user)) \
+    or (name := re.search(r"(?<=\bv\splánu\s)[ěščřžýáíéóúůďťňa-z\s]+", dial.user)):
+        pass
+    # if name is provided explicitly
     elif name := re.search(r"(?<=\bnázev\s)|(?<=\bjméno\s)[ěščřžýáíéóúůďťňa-z\s]+", dial.user):
+        pass
+    # finish the processing
+    if name:
         name = name.group()
-        if name:
-            dial.nlu.append(DAI(intent="inform", slot="name", value=name))
+        name = re.sub(r"\bmi\b", '', name)
+        name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').strip().split()
+        name = ' '.join(name)
+        name = lemmatize_string(name)
+        dial.nlu.append(DAI(intent="inform", slot="name", value=name))
