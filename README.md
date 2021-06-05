@@ -1,5 +1,5 @@
 # 📅 Dialogue planner
-Task-oriented dialogue system for calendar management in Czech language based on [Dialmonkey framework](https://gitlab.com/ufal/dsg/dialmonkey).
+Task-oriented dialogue system for calendar management in Czech language based on [Dialmonkey framework](https://gitlab.com/ufal/dsg/dialmonkey), [MorphoDiTa](https://ufal.mff.cuni.cz/morphodita) is used for lemmatization.
 
 ## Usage
 First make sure all [requirements](/requirements.txt) are satisfied, this can be accomplished by running `pip install -r requirements.txt`, prefereably in _venv_ or something similar.
