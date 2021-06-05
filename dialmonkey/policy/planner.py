@@ -74,6 +74,9 @@ class PlannerPolicy(Component):
             
             if goal == "greet":
                 dial.action.append(DAI(intent="inform", slot="greet", value=None))
+            
+            elif goal == "bye":
+                dial.action.append(DAI(intent="inform", slot="bye", value=None))
 
             elif goal == "ask_day":
                 slots_needed = ["date"]

@@ -71,6 +71,8 @@ def get_task(dial):
         dial.nlu.append(DAI(intent="task", slot="goal", value="ask_event"))
     elif "odpověď" in dial.user or "odpoved" in dial.user:
         dial.nlu.append(DAI(intent="task", slot="goal", value="42"))
+    elif "nashledanou" in dial.user or "nashle" in dial.user:
+        dial.nlu.append(DAI(intent="task", slot="goal", value="bye"))
 
 def get_inform_date(dial):
     # Parsing of stuff like "today" or "tomorrow"

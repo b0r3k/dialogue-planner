@@ -6,6 +6,11 @@
             "Zdravím. Co můžu udělat s kalendářem? Omlouvám se, když mi to někdy moc nepůjde.",
             "Dobrý den. Co si přejete? Moc toho neumím, jen manipulovat s událostmi v kalendáři a ještě občas moc nerozumím."
         ],
+        "bye": [
+            "Nashledanou!",
+            "Hezký den!",
+            "Těším se přítě!"
+        ],
         "event_by_date,event_name,event_start,event_end,place": [
             "{event_name} od {event_start} do {event_end} v {place}"
         ],
