@@ -136,7 +136,7 @@ def get_inform_date(dial):
         dial.nlu.append(DAI(intent="inform", slot="date", value=str(value)))
 
 def get_inform_place(dial):
-    if place := re.search(r"(?<=\bv\s)[\s]+", dial.user):
+    if place := re.search(r"(?<=\bv\s)[ěščřžýáíéóúůďťňa-z\s]+", dial.user):
         place = place.group()
         if place:
             dial.nlu.append(DAI(intent="inform", slot="place", value=place))
