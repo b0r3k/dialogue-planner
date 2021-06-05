@@ -244,6 +244,8 @@ def get_inform_name(dial):
         name = name.group()
         name = re.sub(r"\bmi\b", '', name)
         name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').strip().split()
-        name = ' '.join(name)
-        name = lemmatize_string(name)
-        dial.nlu.append(DAI(intent="inform", slot="name", value=name))
+        if name:
+            name = ' '.join(name)
+            name = lemmatize_string(name)
+        if name:
+            dial.nlu.append(DAI(intent="inform", slot="name", value=name))
