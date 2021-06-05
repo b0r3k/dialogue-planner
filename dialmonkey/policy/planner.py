@@ -58,12 +58,15 @@ class PlannerPolicy(Component):
             self.last_goal = goal
         
         if self.asked_confirmation:
-            # If asked for confirmation, check if confirmed, if not it's neccessary to ask again
+            # If asked for confirmation, check if confirmed, if not it's neccessary to ask what now
             if get_confirmation(dial):
                 self.confirmed = True
             else:
                 self.confirmed = False
                 self.asked_confirmation = False
+                dial.action.append(DAI(intent="ask", slot="what_not_confirmed", value=None))
+                logger.info('Policy: %s', str(dial.action))
+                return dial
 
 
         if goal_known:

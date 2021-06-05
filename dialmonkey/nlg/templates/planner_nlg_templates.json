@@ -67,6 +67,9 @@
             "První budu potřebovat vědět, o jaké události v kalendáři se bavíme.",
             "Jakou událost máte na mysli?"
         ],
+        "what_not_confirmed": [
+            "Co tedy chcete? Pamatuji si všechny hodnoty, můžete nějakou změnit."
+        ],
         "confirm_add,confirm_name,confirm_date,confirm_time_start,confirm_time_end,confirm_place": [
             "Chcete přidat {confirm_name} dne {confirm_date} v {confirm_place} od {confirm_time_start} do {confirm_time_end}?"
         ],
