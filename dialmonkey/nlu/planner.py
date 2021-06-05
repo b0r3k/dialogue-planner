@@ -55,7 +55,9 @@ def get_undo(dial):
         dial.nlu.append(DAI(intent="undo"))
 
 def get_task(dial):
-    if re.search(r"\bdo(prav|sta|je[td])(?![črv])\S*\b", dial.user):
+    if "ahoj" in dial.user or "dobrý den" in dial.user or "dobry den" in dial.user or "čau" in dial.user or "zdravím" in dial.user or "zdravim" in dial.user:
+        dial.nlu.append(DAI(intent="task", slot="goal", value="greet"))
+    elif re.search(r"\bdo(prav|sta|je[td])(?![črv])\S*\b", dial.user):
         dial.nlu.append(DAI(intent="task", slot="goal", value="plan_commute"))
     elif re.search(r"\b(co|jak\w)\b.*", dial.user):
         dial.nlu.append(DAI(intent="task", slot="goal", value="ask_day"))

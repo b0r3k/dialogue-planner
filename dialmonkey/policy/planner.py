@@ -72,7 +72,10 @@ class PlannerPolicy(Component):
         if goal_known:
             # Try to accomplish the goal, always check if all the slots are filled, ask confirmation when needed
             
-            if goal == "ask_day":
+            if goal == "greet":
+                dial.action.append(DAI(intent="inform", slot="greet", value=None))
+
+            elif goal == "ask_day":
                 slots_needed = ["date"]
                 if not (missing_slots := check_slots(dial, slots_needed)):
                     # Call the API and get the events (up to 10) for given day
