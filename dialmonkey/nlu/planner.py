@@ -136,7 +136,7 @@ def get_inform_date(dial):
         dial.nlu.append(DAI(intent="inform", slot="date", value=str(value)))
 
 def get_inform_place(dial):
-    if place := re.search(r"(?<=\bv\s)[\w\s]+", dial.user):
+    if place := re.search(r"(?<=\bv\s)[\s]+", dial.user):
         place = place.group()
         if place:
             dial.nlu.append(DAI(intent="inform", slot="place", value=place))
@@ -216,17 +216,19 @@ def get_inform_duration(dial):
         dial.nlu.append(DAI(intent="inform", slot="duration", value=str(hours)+':'+minutes))
 
 def get_inform_name(dial):
-    if name := re.search(r"(?<=\bpřid[aáe][jtm]\s)[\w\s]+(?=[?:!,.\d])", dial.user) or (name := re.search(r"((?<=naplánovat\s)|(?<=naplánuj\s))[\w\s]+(?=[,.\d])", dial.user)):
+    if name := re.search(r"(?<=\bpřid[aáe][jtm]\s)[ěščřžýáíéóúůďťňa-z\s]+?(?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b)", dial.user) or (name := re.search(r"((?<=naplánovat\s)|(?<=naplánuj\s))[ěščřžýáíéóúůďťňa-z\s]+?((?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b))", dial.user)):
         name = name.group()
-        name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').strip()
+        name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').replace(" mi ", '').strip().split()
+        name = ' '.join(name)
         if name:
             dial.nlu.append(DAI(intent="inform", slot="name", value=name))
-    elif name := re.search(r"(?<=\bv\splánu\spříští\s)[\w\s]+(?=[?!:,.\d])", dial.user) or (name := re.search(r"(?<=\bv\splánu\s)[\w\s]+(?=[?!:,.\d])", dial.user)):
+    elif name := re.search(r"(?<=\bv\splánu\spříští\s)[ěščřžýáíéóúůďťňa-z\s]+?(?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b)", dial.user) or (name := re.search(r"(?<=\bv\splánu\s)[ěščřžýáíéóúůďťňa-z\s]+?(?=[\?!:,\.\d])|(?=\bod\b)|(?=\bna\b)", dial.user)):
         name = name.group()
-        name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').strip()
+        name = name.replace("zítra",'').replace("dlouhodobě",'').replace("pozítří",'').replace("mi", '').strip().split()
+        name = ' '.join(name)
         if name:
             dial.nlu.append(DAI(intent="inform", slot="name", value=name))
-    elif name := re.search(r"(?<=\bnázev\s)|(?<=\bjméno\s)[\w\s]+", dial.user):
+    elif name := re.search(r"(?<=\bnázev\s)|(?<=\bjméno\s)[ěščřžýáíéóúůďťňa-z\s]+", dial.user):
         name = name.group()
         if name:
             dial.nlu.append(DAI(intent="inform", slot="name", value=name))
