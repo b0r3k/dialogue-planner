@@ -272,6 +272,10 @@ class PlannerPolicy(Component):
                     # Ask about the missing slots
                     for missing_slot in missing_slots:
                         dial.action.append(DAI(intent="ask", slot=missing_slot, value=None))
+
+
+            elif goal == "42":
+                dial.action.append(DAI(intent="inform", slot="42", value=None))
                 
 
             else:

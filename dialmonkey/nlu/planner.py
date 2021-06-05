@@ -59,7 +59,7 @@ def get_task(dial):
         dial.nlu.append(DAI(intent="task", slot="goal", value="greet"))
     elif re.search(r"\bdo(prav|sta|je[td])(?![črv])\S*\b", dial.user):
         dial.nlu.append(DAI(intent="task", slot="goal", value="plan_commute"))
-    elif re.search(r"\b(co|jak\w)\b.*", dial.user):
+    elif re.search(r"\b(co|jak(?!á)\w+)\b.*", dial.user):
         dial.nlu.append(DAI(intent="task", slot="goal", value="ask_day"))
     elif re.search(r"\bpřid[aáe]\S*\b", dial.user) or re.search(r"(?<!v\s)(na)?plán(?!k)[ouy]?\S*\b", dial.user):
         dial.nlu.append(DAI(intent="task", slot="goal", value="add_event"))
@@ -69,6 +69,8 @@ def get_task(dial):
         dial.nlu.append(DAI(intent="task", slot="goal", value="change_event"))
     elif re.search(r"\bkd[ye].*\b(bud[ue](?![jln])\w*|mám)\b.*", dial.user):
         dial.nlu.append(DAI(intent="task", slot="goal", value="ask_event"))
+    elif "odpověď" in dial.user or "odpoved" in dial.user:
+        dial.nlu.append(DAI(intent="task", slot="goal", value="42"))
 
 def get_inform_date(dial):
     # Parsing of stuff like "today" or "tomorrow"

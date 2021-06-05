@@ -25,6 +25,11 @@
         ],
         "succ_del": [
             "Úspěšně smazáno! Co si přejete dál?"
+        ],
+        "42": [
+            "Čtyřicet dva.",
+            "Odpověď byla, je a vždy bude 42.",
+            "42"
         ]
 
     },
