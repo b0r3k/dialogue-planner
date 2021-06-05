@@ -61,7 +61,7 @@ def process_request():
     if "start_session" in rqst:
         # new session, start new dialog
         dial = Dialogue()
-        response, _ = handler.get_response(dial, "pomoc")
+        response, _ = handler.get_response(dial, "ahoj")
         dialogues[sessid]["dial"] = dial.serialize()
         dialogues[sessid]["last_used"] = now
         # check all the dialogues, delete older than cca 3 minutes
