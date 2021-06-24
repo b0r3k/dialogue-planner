@@ -2,7 +2,15 @@
 Task-oriented dialogue system for calendar management in Czech language based on [Dialmonkey framework](https://gitlab.com/ufal/dsg/dialmonkey), [MorphoDiTa](https://ufal.mff.cuni.cz/morphodita) is used for lemmatization.
 
 ## Usage
-First make sure all [requirements](/requirements.txt) are satisfied, this can be accomplished by running `pip install -r requirements.txt`, prefereably in _venv_ or something similar.
+First make sure all [requirements](/requirements.txt) are satisfied, this can be accomplished by running (prefereably in _venv_ or something similar):
+
+```pip install -r requirements.txt```
+
+Then don't forget installing `dialmonkey` running
+
+```pip install -e .```
+
+in the `dialogue-planner` directory.
 
 The best way to try Planner out is to run `python3 webserver/server.py` and then access `localhost:8122` in the web browser, all the instructions are provided there.
 
