@@ -14,7 +14,7 @@ in the `dialogue-planner` directory.
 
 The best way to try Planner out is to run `python3 webserver/server.py` and then access `localhost:8122` in the web browser, all the instructions are provided there.
 
-Another option is to try it out in console, run `python3 run_dialmonkey.py --conf conf/planner.yaml`. Then input czech text with diacritics and preferably with interpunction, e.g.: _„co mám v plánu zítra?“_ The casing of letters does not matter.
+Another option is to try it out in console, run `python3 run_dialmonkey.py --conf conf/planner.yaml`. Then input czech text with diacritics, e.g.: _„co mám v plánu zítra?“_ The casing of letters does not matter.
 
 ### Authentication
 Since the Planner uses [Google Calendar API](https://developers.google.com/calendar/overview) to communicate with the calendar, authentication to the google account is necessary. The app is in the test mode, so only accounts listed as testers can authenticate. You can either contact me or use dialogue.planner.testing@gmail.com with password being the first heading of this README (without the emoji and using `-` instead of space).
