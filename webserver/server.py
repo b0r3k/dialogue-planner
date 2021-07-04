@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import pickle
 import time
 import uuid
 from flask import Flask, send_from_directory, send_file, session, request, abort
@@ -14,43 +15,9 @@ from dialmonkey.dialogue import Dialogue
 app = Flask(__name__)
 app.secret_key = b'445234uedoeh#&$HEDU'  # replace this before using
 
-# WORKER_ADDRS = ['http://localhost:8123', 'http://localhost:8124']
-# TIMEOUT = 60
-
-
-# class Workers:
-
-#     def __init__(self):
-#         self.workers = [{'addr': worker_addr, 'last_used': 0, 'sessid': None}
-#                         for worker_addr in WORKER_ADDRS]
-#         self.sessid_to_worker = {}
-
-#     def get_worker(self, sessid):
-#         now = time.time()
-#         try:
-#             worker = self.sessid_to_worker[sessid]
-#         except KeyError:
-#             worker = None
-#             for w in self.workers:
-#                 if w['last_used'] < now - TIMEOUT:
-#                     worker = w
-#                     break
-#         if worker:
-#             if worker['sessid'] in self.sessid_to_worker:
-#                 del self.sessid_to_worker[worker['sessid']]
-#             self.sessid_to_worker[sessid] = worker
-#             worker['sessid'] = sessid
-#             worker['last_used'] = now
-#             return worker
-#         return None
-
-
-# workers = Workers()
-
-
 @app.route('/request', methods=['GET', 'POST'])
 def process_request():
-    global handler, dialogues
+    global config, dialogues
     # handle the session id
     sessid = session.get('sessid', uuid.uuid4())
     session['sessid'] = sessid
@@ -61,7 +28,10 @@ def process_request():
     if "start_session" in rqst:
         # new session, start new dialog
         dial = Dialogue()
-        response, _ = handler.get_response(dial, "ahoj")
+        handler = ConversationHandler(config)
+        response = "Proběhla autentikace."
+        # response, _ = handler.get_response(dial, "ahoj")
+        dialogues[sessid]["handler"] = handler
         dialogues[sessid]["dial"] = dial.serialize()
         dialogues[sessid]["last_used"] = now
         # check all the dialogues, delete older than cca 3 minutes
@@ -82,6 +52,7 @@ def process_request():
         if sessid in dialogues:
             dial = Dialogue()
             dial.load_from_serialized(dialogues[sessid]["dial"])
+            handler = dialogues[sessid]["handler"]
             response, _ = handler.get_response(dial, rqst["user"])
             dialogues[sessid]["dial"] = dial.serialize()
             dialogues[sessid]["last_used"] = now
@@ -98,8 +69,7 @@ def return_index():
 
 
 if __name__ == '__main__':
-    config = load_conf("conf/planner.yaml")
-    handler = ConversationHandler(config)
+    config = load_conf("conf/planner_server.yaml")
     dialogues = defaultdict(dict)
 
     ap = ArgumentParser()
