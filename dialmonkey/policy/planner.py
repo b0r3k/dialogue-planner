@@ -94,12 +94,24 @@ class PlannerPolicy(Component):
                     # Append information about each event into system action
                     for event in events:
                         dial.action.append(DAI(intent="inform", slot="event_by_date", value=None))
-                        dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
-                        start = datetime.fromisoformat(event["start"]["dateTime"])
-                        dial.action.append(DAI(intent="inform", slot="event_start", value=start.strftime("%H:%M")))
-                        end = datetime.fromisoformat(event["end"]["dateTime"])
-                        dial.action.append(DAI(intent="inform", slot="event_end", value=end.strftime("%H:%M")))
-                        dial.action.append(DAI(intent="inform", slot="place", value=event["location"]))
+                        if "summary" in event:
+                            dial.action.append(DAI(intent="inform", slot="event_name", value=event["summary"]))
+                        else:
+                            dial.action.append(DAI(intent="inform", slot="event_name", value="(bez názvu)"))
+                        if "start" in event and "dateTime" in event["start"]:
+                            start = datetime.fromisoformat(event["start"]["dateTime"])
+                            dial.action.append(DAI(intent="inform", slot="event_start", value=start.strftime("%H:%M")))
+                        else:
+                            dial.action.append(DAI(intent="inform", slot="event_start", value="začátku dne"))
+                        if "end" in event and "dateTime" in event["end"]:
+                            end = datetime.fromisoformat(event["end"]["dateTime"])
+                            dial.action.append(DAI(intent="inform", slot="event_end", value=end.strftime("%H:%M")))
+                        else:
+                            dial.action.append(DAI(intent="inform", slot="event_end", value="konce dne"))
+                        if "location" in event:
+                            dial.action.append(DAI(intent="inform", slot="place", value=event["location"]))
+                        else:
+                            dial.action.append(DAI(intent="inform", slot="place", value="(neznámý)"))
 
                     # Reset the state
                     super(Dialogue, dial).__setattr__('state', dotdict({}))
