@@ -1,0 +1,3 @@
+## Zadání
+
+Cílem ročníkového projektu je naimplementovat dialogový systém pro doménu kalendáře s textovým interface v přirozeném jazyce (předpokládá se čeština). Systém bude schopen uživateli podat přehled kalendáře pro zadaný den, odpovídat na dotazy ohledně událostí, přidávat je, měnit a mazat. Data kalendáře budou zpracovávána přes Google Calendar API. Primárním jazykem pro vývoj aplikace bude Python; aplikace bude implementována jako backend server založený na dialogové platformě Dialmonkey a jednoduchý webový frontend používající AJAX pro komunikaci s backendem.
