@@ -2,6 +2,18 @@
 
 Dialogový systém v českém jazyce pro manipulaci s Google kalendářem postavený na frameworku [Dialmonkey](https://gitlab.com/ufal/dsg/dialmonkey), pro lemmatizaci je použita [MorphoDiTa](https://ufal.mff.cuni.cz/morphodita).
 
+## Obsah
+- [📅 Plánovač](#-plánovač)
+  - [Obsah](#obsah)
+  - [Instalace](#instalace)
+  - [Používání](#používání)
+    - [Dialog](#dialog)
+    - [Webserver](#webserver)
+      - [Více uživatelů naráz](#více-uživatelů-naráz)
+    - [Konzole](#konzole)
+    - [Autentizace](#autentizace)
+  - [Vývoj](#vývoj)
+
 ## Instalace
 
 Celou instalaci je doporučeno dělat ve _venv_ nebo něčem podobném. U následujících příkazů je předpokládané spuštění v "root" directory `dialogue-planner`.
@@ -41,3 +53,6 @@ Po provedení autentizace pak bude dialog probíhat v konzoli, ukončen může b
 Aplikace je v testovacím módu, tedy autentizace je zatím možná jen pro účty specificky uvedené jako testovací. V opačném případě je autentizace hned na začátku zamítnuta.
 
 Pro funkčnost Plánovače je třeba udělit mu oprávnění k manipulaci s Google kalendářem u účtu, který chcete použít. Jakmile toto uděláte při použití přes konzoli, Plánovač si uloží identifikátor do souboru `examples-testing/token.json` a příště již autentizace není nutná. Při použití přes webserver je potřeba provést autentizaci vždy na začátku dialogu, uložení identifikátoru není podporováno.
+
+## Vývoj
+
