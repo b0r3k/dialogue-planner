@@ -7,8 +7,11 @@ Dialogový systém v českém jazyce pro manipulaci s Google kalendářem postav
 Celou instalaci je doporučeno dělat ve _venv_ nebo něčem podobném. U následujících příkazů je předpokládané spuštění v "root" directory `dialogue-planner`.
 
 První je potřeba nainstalovat všechny využívané moduly, jejichž seznam lze najít v `requirements.txt`. Instalaci jde provést jednoduše pomocí:
+
 ```pip install -r requirements.txt```
+
 Poté je potřeba nainstalovat _Dialmonkey_, což je možné pomocí:
+
 ```pip install -e .```
 
 ## Používání
