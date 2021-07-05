@@ -16,7 +16,10 @@ Dialogový systém v českém jazyce pro manipulaci s Google kalendářem postav
     - [Konfigurace](#konfigurace)
     - [Řízení dialogu](#řízení-dialogu)
     - [Komponenty](#komponenty)
-      - [NLU](#nlu)
+      - [NLU - `dialmonkey/nlu/planner.py`](#nlu---dialmonkeynluplannerpy)
+      - [DST - `dialmonkey/dst/rule.py`](#dst---dialmonkeydstrulepy)
+      - [DP - `dialmonkey/policy/planner.py`respektive `dialmonkey/policy/planner_server.py`](#dp---dialmonkeypolicyplannerpyrespektive-dialmonkeypolicyplanner_serverpy)
+      - [NLG - `dialmonkey/nlg/planner.py`](#nlg---dialmonkeynlgplannerpy)
 
 ## Instalace
 
@@ -76,10 +79,36 @@ Vlastní dialog je pak uložen v instanci třídy `Dialogue`. Na začátku je do
 
 ### Komponenty
 
-Plánovač používá kompenty NLU (_natural language understanding_ - extrakce významu z přirozeného jazyka), DST (_dialogue state tracking_ - sledování toho, co uživatel zmínil již dřív, případně úprava), DP (_dialogue policy_ - provedení úkonů a vygenerování významu toho, co má být sděleno uživateli) a NLG (_natural language generation_ - vytvoření vět v přirozeném jazyce z významu vygenerovaného DP).
+Plánovač používá kompenty NLU (_natural language understanding_ - extrakce významu z přirozeného jazyka), DST (_dialogue state tracking_ - sledování toho, co uživatel zmínil již dřív, případně úprava), DP (_dialogue policy_ - provedení úkonů a vygenerování významu toho, co má být sděleno uživateli) a NLG (_natural language generation_ - vytvoření vět v přirozeném jazyce z významu vygenerovaného DP). Každá komponenta musí dědit od abstraktní třídy `Component`.
 
-#### NLU
+#### NLU - `dialmonkey/nlu/planner.py`
 
-NLU vezme vstup uživatele a pomocí série funkcí se z něj pokusí dostat význam související s tématem, kde každá funkce se specializuje na extrakci konkrétní části - jedna se snaží zjistit, jestli uživatel zmínil něco o datu, jiná jestli zmínil něco o času, jiná o co se uživatel celkově snaží.
+NLU vezme vstup uživatele (který vyplnil `ConversationHandler`) a pomocí série funkcí se z něj pokusí dostat význam související s tématem, kde každá funkce se specializuje na extrakci konkrétní části - jedna se snaží zjistit, jestli uživatel zmínil něco o datu, jiná jestli zmínil něco o času, jiná o co se uživatel celkově snaží.
 
 Každá funkce používá sérii `if-else` větví, které se obvykle snaží pomocí _regulárních výrazů_ najít něco v uživatelově vstupu - například pokud ve vstupu je "v [číslo]", pravděpodobně se jedná o časový údaj.
+
+V případě názvů událostí a míst je vstup pomocí MorphoDiTy převeden na lemma, tedy místo například `doktora` NLU uloží jen `doktor` (tedy potom když máte v kalendáři událost _doktor_, můžete se zeptat _„kdy mám v plánu doktora?“_ a událost bude správně nalezena).
+
+#### DST - `dialmonkey/dst/rule.py`
+
+DST je připraven jak pro aktuální použití bez pravděpodobností, tak pro případné rozšíření o pravděpodobnosti. Vlastní stav je slovník, který má jako klíče názvy slotů. Při použití bez pravděpodobností je jednoduše přidán záznam do slovníku, pokud tento klíč ve slovníku již existoval, je hodnota přepsána (chápáno tak, že si to uživatel rozmyslel). Speciálním je intent `task` se slotem `goal`, jehož hodnota je uložena pod klíč `goal_`, tato hodnota je dále chápána jako uživatelův primární cíl v konverzaci.
+
+#### DP - `dialmonkey/policy/planner.py`respektive `dialmonkey/policy/planner_server.py`
+
+Při inicializaci DP je vytvořena zároveň i služba pro komunikaci s Google Calendar API, tedy provedena autentizace. Tato autentizace je pak provázána s danou instancí DP (a přeneseně pak s instancí `ConversatioHandleru`, ke kterému DP patří). V případě standardní verze je autentizační token uložen do `examples-testing/token.json`, takže při dalším behu již není autentizace ze strany uživatele nutná. V případě webové verze se token neukládá je nutno provést autentizaci při zahájení dialogu.
+
+DP se dívá na `goal_` dané konverzace a na základě toho koná. U manipulací s událostmi se ještě uživatele ptá na potvrzení, že vše bylo pochopeno správně. Pokud se uživatelův cíl změní, přechozí potvrzení je samozřejmě zneplatněno.
+
+Pro každý druh úkonu má DP seznam slotů, jejichž zaplnění kontroluje (například pro dotaz na události v nějakém dni je třeba znát, jaký den uživatele zajímá). Pokud tyto sloty nejsou zaplněny, DP vyplní záměr na tyto sloty se zeptat. Pokud jsou všechny sloty pro danou akci vyplněny, vyplní jako záměr podat všechny informace (pokud šlo jen o dotazovací cíl), nebo zeptat se na potvrzení (pokud byla cílem nějaká manipulace). Pokud uživatel potvrzení udělí, je manipulace provedena a vyplněn záměr informovat o tom.
+
+V případě inforamcí o událostech, kdy je vyplněno více informačních slotů, přidává na jejich začátek speciální slot `event_by_name` nebo `event_by_date`, které NLG napovídají, kolik následujících slotů má pro informování použít.
+
+#### NLG - `dialmonkey/nlg/planner.py`
+
+NLG vezme záměry vyplněné DP a pomocí šablon uložených v `dialmonkey/nlg/templates/planner.json` je převede na přirozený jazyk. Většina šablon má více variant, v takovém případě je mezi nimi vybráno náhodně.
+
+Pokud detekuje jeden ze speciálních slotů `event_by_(name|date)`, použije následujících 5 (nebo 4) sloty pro informování o událostech pomocí šablony. Pokud takových událostí je víc, spojí je náhodně vybranou spojkou.
+
+Všechny zbylé sloty se snaží zpracovat tak, že první zkusí najít šablonu odpovídající všem slotům. Pokud takovou nenajde, zkusí najít šablonu odpovídající dvěma po sobě jdoucím slotům. Pokud ani takovou nenajde, použije šablonu pro samostatný slot (které pro každý slot existují) a pokračuje dál. Ideální by bylo zkusit najít šablonu pokrývající co nejvíce slotů, ale to bychom museli procházet všechny podmnožiny slotů, tedy v nejhorším případě množství kombinací exponenciální k množství slotů, což by bylo neudržitelné.
+
+Věty v přirozeném jazyce pak vrátí jako `system_response` a `ConversationHandler` tuto odpověď vrátí uživateli.
