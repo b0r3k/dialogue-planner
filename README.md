@@ -26,5 +26,8 @@ The Planner has 4 units cooperating:
 - DP (dialogue policy) decides what action to take based on the state and current output of NLU.
 - NLG (natural language generation) is template-driven - it uses output of DP and slot-values from state to fill in a template with sentences in natural language, possibly combining more templates. Then it fills in the system response.
 
+## Documentation
+More documentation (in Czech only) together with specification can be found in [documentation](/documentation)
+
 ## Examples
 Examples of behaviour of each unit can be found in [examples-testing](/examples-testing).
