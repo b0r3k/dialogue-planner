@@ -16,17 +16,25 @@ Poté je potřeba nainstalovat _Dialmonkey_, což je možné pomocí:
 
 ## Používání
 
+### Dialog
+Pro komunikaci se systémem je třeba využívat češtiny včetně diakritiky. Na velikosti písmen nezáleží. Příklady zadání: _„co mám v plánu zítra?“, „kdy mám v plánu státnice?“, „změnit na 25.6.2022“, „smazat“, „přidat kadeřnictví, 5.6.2021 od 13 do 17 hodin“_
+
 ### Webserver
 Nejjednodušším způsobem je spustit Plánovač jako lokální webserver pomocí:
+
 ```python webserver/server.py```
-Flask vygeneruje `localhost` adresu, ke které je možné přistoupit přes prohlížeč. Na jednoduché stránce pak naleznete instrukce ke komunikaci (je třeba zadávat věty v přirozném jazyce včetně diakritiky) a tlačítko `Start dialogue` k zahájení dialogu. Po stisku tlačítka je nejprve provedena autentizace ke Google účtu (o té více ve [speciální sekci](#autentizace)). Po úspěšné autentizaci je na stránce zpřístupněno pole pro zadání vstupu, který je odeslán stiskem klávesy `Enter`. Následně je vygenerována odpověď systému a spolu se vstupem jsou zobrazeny nad zadávacím polem. Poté je možné v dialogu pokračovat zadáním dalšího vstupu, nebo dialog ukončit stiskem tlačítka `End dialogue`. Pokud uživatel dialog sám neukončí, je dialog ukončen po přibližně 3 minutách neaktivity.
+
+_Flask_ vygeneruje `localhost` adresu, ke které je možné přistoupit přes prohlížeč. Na jednoduché stránce pak naleznete instrukce ke komunikaci a tlačítko `Start dialogue` k zahájení dialogu. Po stisku tlačítka je nejprve provedena autentizace ke Google účtu (o té více ve [speciální sekci](#autentizace)). Po úspěšné autentizaci je na stránce zpřístupněno pole pro zadávání vstupu, který je odeslán stiskem klávesy `Enter`. Následně je vygenerována odpověď systému a spolu se vstupem jsou zobrazeny nad zadávacím polem. Poté je možné v dialogu pokračovat zadáním dalšího vstupu, nebo dialog ukončit stiskem tlačítka `End dialogue`. Pokud uživatel dialog sám neukončí, je dialog ukončen po přibližně 3 minutách neaktivity.
 #### Více uživatelů naráz
 Webserver umožňuje přístup více uživatelů v jednu chvíli, ovšem požadavky jsou vykonávány sekvenčně. Rozlišení uživatelů je prováděno pomocí `session id`, které prohlížeč posílá spolu s požadavkem. Proto v případě použití z jednoho počítače je potřeba využít _Anonymní režim_ nebo něco podobného, který zajistí jiné `id` než jen nová karta v prohlížeči.
+
 Každý uživatel může být spojen s jiným Google účtem.
 
 ### Konzole
 Druhým možným způsobem použití je přes konzoli, kde je možné spustit:
+
 ```python run_dialmonkey.py --conf conf/planner.yaml```
+
 Po provedení autentizace pak bude dialog probíhat v konzoli, ukončen může být zadáním prázdného vstupu, či klíčového slova `konec`. V obou těchto případech je v adresáři uložena historie dialogu v souboru `history-*.json`. Pokud je běh dialogu ukončen stiskem `Ctrl+C`, historie uložena není.
 
 ### Autentizace
