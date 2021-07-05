@@ -13,6 +13,10 @@ Dialogový systém v českém jazyce pro manipulaci s Google kalendářem postav
     - [Konzole](#konzole)
     - [Autentizace](#autentizace)
   - [Vývoj](#vývoj)
+    - [Konfigurace](#konfigurace)
+    - [Řízení dialogu](#řízení-dialogu)
+    - [Komponenty](#komponenty)
+      - [NLU](#nlu)
 
 ## Instalace
 
@@ -56,3 +60,26 @@ Pro funkčnost Plánovače je třeba udělit mu oprávnění k manipulaci s Goog
 
 ## Vývoj
 
+Jak již bylo zmíněno, celý systém je postaven na frameworku _Dialmonkey_.
+
+### Konfigurace
+
+Konfigurace je uložena v sobouru ve složce `conf`. Vždy musí obsahovat seznam komponent, které budou použity, a slova rozpoznávaná jako konec dialogu. Volitelně může obsahovat také úroveň loggingu či input/output kanály, tyto ale mohou být přepsány při spuštění.
+
+Plánovač používá při běhu v konzoli konfiguraci `conf/planner.yaml`, při běhu jako webserver pak `conf/planner_server.yaml`.
+
+### Řízení dialogu
+
+O řízení dialogu se stará instance třídy `ConversationHandler`, která bere jako parametr konfigurační soubor. Tato instance při inicializaci zajistí vytvoření všech komponent dle konfigurace.
+
+Vlastní dialog je pak uložen v instanci třídy `Dialogue`. Na začátku je do ní uložen uživatelův vstup. Následně je tato instance posupně předávána všem nakonfigurovaným komponentám, každá komponenta si obvykle něco vyplněného předchozími a vrátí instanci upravenou o svůj výstup.
+
+### Komponenty
+
+Plánovač používá kompenty NLU (_natural language understanding_ - extrakce významu z přirozeného jazyka), DST (_dialogue state tracking_ - sledování toho, co uživatel zmínil již dřív, případně úprava), DP (_dialogue policy_ - provedení úkonů a vygenerování významu toho, co má být sděleno uživateli) a NLG (_natural language generation_ - vytvoření vět v přirozeném jazyce z významu vygenerovaného DP).
+
+#### NLU
+
+NLU vezme vstup uživatele a pomocí série funkcí se z něj pokusí dostat význam související s tématem, kde každá funkce se specializuje na extrakci konkrétní části - jedna se snaží zjistit, jestli uživatel zmínil něco o datu, jiná jestli zmínil něco o času, jiná o co se uživatel celkově snaží.
+
+Každá funkce používá sérii `if-else` větví, které se obvykle snaží pomocí _regulárních výrazů_ najít něco v uživatelově vstupu - například pokud ve vstupu je "v [číslo]", pravděpodobně se jedná o časový údaj.
