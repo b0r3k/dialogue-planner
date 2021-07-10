@@ -27,7 +27,11 @@ The Planner has 4 units cooperating:
 - NLG (natural language generation) is template-driven - it uses output of DP and slot-values from state to fill in a template with sentences in natural language, possibly combining more templates. Then it fills in the system response.
 
 ## Documentation
-More documentation (in Czech only) together with specification can be found in [documentation](/documentation)
+More documentation (in Czech only) together with specification can be found under [documentation](/documentation):
+
+* [Assignment/project aims](documentation/zadani.md)
+* [Detailed project specification](documentation/specifikace.md)
+* [Full system documentation](documentation/dokumentace.md)
 
 ## Examples
 Examples of behaviour of each unit can be found in [examples-testing](/examples-testing).
