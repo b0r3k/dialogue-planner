@@ -25,7 +25,7 @@ Dialogový systém v českém jazyce pro manipulaci s Google kalendářem postav
 
 Celou instalaci je doporučeno dělat ve _venv_ nebo něčem podobném. U následujících příkazů je předpokládané spuštění v "root" directory `dialogue-planner`.
 
-První je potřeba nainstalovat všechny využívané moduly, jejichž seznam lze najít v `requirements.txt`. Instalaci jde provést jednoduše pomocí:
+Nejprve je potřeba nainstalovat všechny využívané moduly, jejichž seznam lze najít v `requirements.txt`. Instalaci jde provést jednoduše pomocí:
 
 ```pip install -r requirements.txt```
 
@@ -63,7 +63,7 @@ Pro funkčnost Plánovače je třeba udělit mu oprávnění k manipulaci s Goog
 
 ## Vývoj
 
-Jak již bylo zmíněno, celý systém je postaven na frameworku _Dialmonkey_.
+Jak již bylo zmíněno, celý systém je postaven na frameworku _[Dialmonkey](https://gitlab.com/ufal/dsg/dialmonkey)_. Základní dokumentaci Dialmonkey lze nalézt v repozitáři frameworku.
 
 ### Konfigurace
 
@@ -91,17 +91,17 @@ V případě názvů událostí a míst je vstup pomocí MorphoDiTy převeden na
 
 #### DST - `dialmonkey/dst/rule.py`
 
-DST je připraven jak pro aktuální použití bez pravděpodobností, tak pro případné rozšíření o pravděpodobnosti. Vlastní stav je slovník, který má jako klíče názvy slotů. Při použití bez pravděpodobností je jednoduše přidán záznam do slovníku, pokud tento klíč ve slovníku již existoval, je hodnota přepsána (chápáno tak, že si to uživatel rozmyslel). Speciálním je intent `task` se slotem `goal`, jehož hodnota je uložena pod klíč `goal_`, tato hodnota je dále chápána jako uživatelův primární cíl v konverzaci.
+DST je připraven jak pro aktuální použití bez uvažování pravděpodobnostního rozložení hodnot slotů, tak pro případné rozšíření o pravděpodobnosti. Vlastní stav je slovník, který má jako klíče názvy slotů. Při použití bez pravděpodobností je jednoduše přidán záznam do slovníku, pokud tento klíč ve slovníku již existoval, je hodnota přepsána (chápáno tak, že si to uživatel rozmyslel). Speciálním je intent `task` se slotem `goal`, jehož hodnota je uložena pod klíč `goal_`, tato hodnota je dále chápána jako uživatelův primární cíl v konverzaci.
 
 #### DP - `dialmonkey/policy/planner.py`respektive `dialmonkey/policy/planner_server.py`
 
-Při inicializaci DP je vytvořena zároveň i služba pro komunikaci s Google Calendar API, tedy provedena autentizace. Tato autentizace je pak provázána s danou instancí DP (a přeneseně pak s instancí `ConversatioHandleru`, ke kterému DP patří). V případě standardní verze je autentizační token uložen do `examples-testing/token.json`, takže při dalším behu již není autentizace ze strany uživatele nutná. V případě webové verze se token neukládá je nutno provést autentizaci při zahájení dialogu.
+Při inicializaci DP je vytvořena zároveň i služba pro komunikaci s Google Calendar API, tedy provedena autentizace. Tato autentizace je pak provázána s danou instancí DP (a přeneseně pak s instancí `ConversatioHandleru`, ke kterému DP patří). V případě konzolové verze je autentizační token uložen do `examples-testing/token.json`, takže při dalším behu již není autentizace ze strany uživatele nutná. V případě webové verze se token neukládá je nutno provést autentizaci při zahájení dialogu.
 
 DP se dívá na `goal_` dané konverzace a na základě toho koná. U manipulací s událostmi se ještě uživatele ptá na potvrzení, že vše bylo pochopeno správně. Pokud se uživatelův cíl změní, přechozí potvrzení je samozřejmě zneplatněno.
 
 Pro každý druh úkonu má DP seznam slotů, jejichž zaplnění kontroluje (například pro dotaz na události v nějakém dni je třeba znát, jaký den uživatele zajímá). Pokud tyto sloty nejsou zaplněny, DP vyplní záměr na tyto sloty se zeptat. Pokud jsou všechny sloty pro danou akci vyplněny, vyplní jako záměr podat všechny informace (pokud šlo jen o dotazovací cíl), nebo zeptat se na potvrzení (pokud byla cílem nějaká manipulace). Pokud uživatel potvrzení udělí, je manipulace provedena a vyplněn záměr informovat o tom.
 
-V případě inforamcí o událostech, kdy je vyplněno více informačních slotů, přidává na jejich začátek speciální slot `event_by_name` nebo `event_by_date`, které NLG napovídají, kolik následujících slotů má pro informování použít.
+V případě informací o událostech, kdy je vyplněno více informačních slotů, přidává na jejich začátek speciální slot `event_by_name` nebo `event_by_date`, které NLG napovídají, kolik následujících slotů má pro informování použít.
 
 #### NLG - `dialmonkey/nlg/planner.py`
 
@@ -109,6 +109,6 @@ NLG vezme záměry vyplněné DP a pomocí šablon uložených v `dialmonkey/nlg
 
 Pokud detekuje jeden ze speciálních slotů `event_by_(name|date)`, použije následujících 5 (nebo 4) sloty pro informování o událostech pomocí šablony. Pokud takových událostí je víc, spojí je náhodně vybranou spojkou.
 
-Všechny zbylé sloty se snaží zpracovat tak, že první zkusí najít šablonu odpovídající všem slotům. Pokud takovou nenajde, zkusí najít šablonu odpovídající dvěma po sobě jdoucím slotům. Pokud ani takovou nenajde, použije šablonu pro samostatný slot (které pro každý slot existují) a pokračuje dál. Ideální by bylo zkusit najít šablonu pokrývající co nejvíce slotů, ale to bychom museli procházet všechny podmnožiny slotů, tedy v nejhorším případě množství kombinací exponenciální k množství slotů, což by bylo neudržitelné.
+Všechny zbylé sloty se snaží zpracovat tak, že nejprve zkusí najít šablonu odpovídající všem slotům. Pokud takovou nenajde, zkusí najít šablonu odpovídající dvěma po sobě jdoucím slotům. Pokud ani takovou nenajde, použije šablonu pro samostatný slot (které pro každý slot existují) a pokračuje dál. Ideální by bylo zkusit najít šablonu pokrývající co nejvíce slotů, ale to bychom museli procházet všechny podmnožiny slotů, tedy v nejhorším případě množství kombinací exponenciální k množství slotů, což by bylo neudržitelné.
 
 Věty v přirozeném jazyce pak vrátí jako `system_response` a `ConversationHandler` tuto odpověď vrátí uživateli.
