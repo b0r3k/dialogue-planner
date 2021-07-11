@@ -3,9 +3,6 @@ from dialmonkey.da import DA, DAI
 from datetime import datetime, timedelta
 import pickle
 from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
 from dialmonkey.dialogue import Dialogue
 from dialmonkey.utils import dotdict
 
