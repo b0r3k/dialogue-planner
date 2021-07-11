@@ -35,12 +35,28 @@ function send_user_input(){
 
     input.disabled = 'disabled';
     outputs.innerHTML += 'User: ' + input.value + '<br/>';
-    post_ajax('./request',
-        {'user': input.value},
-        function(data){ show_system_response(data) },
-        function(status){ show_error(status) }
-    );
-    input.value = '(waiting for system)';
+    if (button.innerHTML == 'Check code'){
+        post_ajax('./request',
+            {'start_session': 1, 'user': input.value},
+            function(data){
+                if (outputs.innerHTML){
+                    outputs.innerHTML += '<br/>***<br/>';
+                }
+                show_system_response(data);
+                button.innerHTML = 'End dialogue';
+            },
+            function(status){ show_error(status) }
+        );
+        input.value = '(waiting for system)';
+    }
+    else {
+        post_ajax('./request',
+            {'user': input.value},
+            function(data){ show_system_response(data) },
+            function(status){ show_error(status) }
+        );
+        input.value = '(waiting for system)';
+    }
 }
 
 function show_system_response(data){
@@ -64,10 +80,23 @@ function process_button_click(){
     var button = getEl('button');
     var input = getEl('user_input');
     var outputs = getEl('outputs');
-
-    if (button.innerHTML == 'Start dialogue'){
+    if (button.innerHTML == 'Authenticate'){
         post_ajax('./request',
-            {'start_session': 1},
+            {'authenticate': 1},
+            function(data){
+                if (outputs.innerHTML){
+                    outputs.innerHTML += '<br/>***<br/>';
+                }
+                show_system_response(data);
+                button.innerHTML = 'Check code';
+            },
+            function(status){ show_error(status) }
+        );
+        input.value = '(fill in code here)';
+    }
+    else if (button.innerHTML == 'Check code'){
+        post_ajax('./request',
+            {'start_session': 1, 'user': input.value},
             function(data){
                 if (outputs.innerHTML){
                     outputs.innerHTML += '<br/>***<br/>';
@@ -96,8 +125,9 @@ function process_button_click(){
 <h1>📅 Planner – testovací rozhraní</h1>
 <div id="descr" style="margin-bottom: 2em; color: gray;">
 <ul>
-<li>Začněte kliknutním na „Start dialogue“. </li>
-<li>Zadávejte český text <strong>s diakritikou</strong> a preferovaně s interpunkcí (na velikosti písmen nezáleží), odešlete klávesou Enter.</li>
+<li>Začněte kliknutním na „Authenticate“, vygenerovaný link otevřete na nové stránce a udělte potřebná oprávnění. </li>
+<li>Získaný kód vložte do vstupního pole a potvrďte stisknutím tlačítka „Check code“ či klávesy Enter. </li>
+<li>Zadávejte český text <strong>s diakritikou</strong> (na velikosti písmen nezáleží), odešlete klávesou Enter.</li>
 <li>Po skončení dialogu klikněte na „End dialogue“.</li>
 <li>Systém umí obsloužit naráz tolik uživatelů, kolik dialogů se vejde do RAM. 😄</li>
 </ul>
@@ -107,7 +137,7 @@ Příklady zadání: <em>„co mám v plánu zítra?“, „kdy mám v plánu st
 </div>
 <div id="outputs"></div>
 <form action="javascript:void(0);" onsubmit="send_user_input();" style="margin-top: 1em;">
-<button type="button" onclick="process_button_click();" id="button">Start dialogue</button><br/>
+<button type="button" onclick="process_button_click();" id="button">Authenticate</button><br/>
 Enter user input: <input type="text" id="user_input" maxlength="200" style="width: 30em;" autocomplete="off" disabled="disabled" value="(click 'Start dialogue' to start)">
 </form>
 </body>

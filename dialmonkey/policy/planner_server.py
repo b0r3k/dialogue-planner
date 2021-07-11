@@ -1,7 +1,7 @@
 from ..component import Component
 from dialmonkey.da import DA, DAI
 from datetime import datetime, timedelta
-import os.path
+import pickle
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -20,13 +20,12 @@ class PlannerPolicy(Component):
         self.last_goal = None
 
         # Build the API service
-        # If modifying these scopes, delete the file token.json.
-        SCOPES = ['https://www.googleapis.com/auth/calendar']
-        # Let the user log in, create credentials, build service
-        flow = InstalledAppFlow.from_client_secrets_file(
-            'examples-testing/credentials.json', SCOPES)
-        creds = flow.run_local_server(port=0)
+
+        # Load flow passed in config from the bot
+        creds = pickle.loads(config["creds"])
+        # Build the service using the credentials from flow
         self.service = build('calendar', 'v3', credentials=creds)
+
 
 
     def __call__(self, dial, logger):

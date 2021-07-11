@@ -6,7 +6,7 @@ output_stream: "dialmonkey.output.text.ConsoleOutput"  # not strictly required
 components:
   - "dialmonkey.nlu.planner.PlannerNLU"
   - "dialmonkey.dst.rule.BeliefStateDST"
-  - "dialmonkey.policy.planner_server.PlannerPolicy"
+  - "dialmonkey.policy.planner_server.PlannerPolicy" : {}
   - "dialmonkey.nlg.planner.PlannerNLG"
 break_words:
   - "konec"
