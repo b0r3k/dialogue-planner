@@ -1,6 +1,6 @@
-## Specifikace - Dialogový asistent pro komunkaci s kalendářem
+## Specifikace - Dialogový asistent pro komunikaci s kalendářem
  
-- [Specifikace - Dialogový asistent pro komunkaci s kalendářem](#specifikace---dialogový-asistent-pro-komunkaci-s-kalendářem)
+- [Specifikace - Dialogový asistent pro komunikaci s kalendářem](#specifikace---dialogový-asistent-pro-komunikaci-s-kalendářem)
   - [1. Manipulace s kalendářem](#1-manipulace-s-kalendářem)
     - [1.1 Výpis událostí pro zadaný den](#11-výpis-událostí-pro-zadaný-den)
     - [1.2 Vyhledávání podle klíčového slova v názvu události](#12-vyhledávání-podle-klíčového-slova-v-názvu-události)
